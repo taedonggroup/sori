@@ -67,7 +67,7 @@ export default function 원석프로필() {
   const remainingCount = 조각목록.length - visibleFragments.length;
 
   return (
-    <main className="min-h-screen bg-black text-white overflow-hidden relative">
+    <main className="min-h-screen bg-black text-white overflow-x-hidden relative">
       {/* 파티클 배경 */}
       <ParticleBackground />
 
@@ -86,7 +86,7 @@ export default function 원석프로필() {
       </header>
 
       {/* ═══ UI 오버레이 ═══ */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6">
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 pb-24">
 
         {/* 상태 1 — 기본 */}
         {currentState === "기본" && (
@@ -118,11 +118,11 @@ export default function 원석프로필() {
               {페르소나.map((키워드, i) => (
                 <span
                   key={키워드}
-                  className="px-5 py-2.5 border border-zinc-800 text-zinc-400 text-sm rounded-full
+                  className="px-5 py-2.5 border border-[rgba(74,111,165,0.25)] text-zinc-400 text-sm rounded-full
                     cursor-default transition-all duration-500 animate-fadeInUp
-                    hover:border-white/40 hover:text-white
-                    hover:shadow-[0_0_20px_rgba(255,255,255,0.08)]"
-                  style={{ animationDelay: `${i * 80}ms`, opacity: 0 }}
+                    hover:border-[rgba(74,111,165,0.6)] hover:text-white
+                    hover:shadow-[0_0_20px_rgba(74,111,165,0.15)]"
+                  style={{ animationDelay: `${i * 80}ms` }}
                 >
                   {키워드}
                 </span>
@@ -151,10 +151,10 @@ export default function 원석프로필() {
                 <div
                   key={조각.id}
                   className="group flex items-center justify-between p-3 rounded-lg
-                    border border-zinc-900 bg-black/30 backdrop-blur-sm
-                    hover:border-zinc-700 hover:bg-zinc-900/60
+                    border border-zinc-900 bg-black/60 backdrop-blur-sm
+                    hover:border-zinc-700 hover:bg-zinc-900/80
                     transition-all duration-300 animate-slideInRight cursor-pointer"
-                  style={{ animationDelay: `${i * 60}ms`, opacity: 0 }}
+                  style={{ animationDelay: `${i * 60}ms` }}
                 >
                   {/* 순서 + 파일명 */}
                   <div className="flex items-center gap-3 min-w-0">
@@ -166,13 +166,13 @@ export default function 원석프로필() {
                     </p>
                   </div>
 
-                  {/* 분석 태그 */}
+                  {/* 분석 태그 — 모바일에서 BPM/키 숨김 */}
                   <div className="flex items-center gap-2 shrink-0 ml-4">
-                    <span className="text-zinc-600 text-xs">{조각.장르}</span>
-                    <span className="text-zinc-800 text-xs">·</span>
-                    <span className="text-zinc-600 text-xs">{조각.BPM}</span>
-                    <span className="text-zinc-800 text-xs">·</span>
-                    <span className="text-zinc-600 text-xs">{조각.키}</span>
+                    <span className="text-zinc-500 text-xs">{조각.장르}</span>
+                    <span className="text-zinc-800 text-xs hidden sm:inline">·</span>
+                    <span className="text-zinc-500 text-xs hidden sm:inline">{조각.BPM}</span>
+                    <span className="text-zinc-800 text-xs hidden sm:inline">·</span>
+                    <span className="text-zinc-500 text-xs hidden sm:inline">{조각.키}</span>
                   </div>
                 </div>
               ))}

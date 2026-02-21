@@ -45,12 +45,14 @@ export default function StoneScene() {
       {/* 원석 */}
       <RawStone />
 
+      {/* 드래그 회전만 허용 — 원석과의 인터랙션 */}
       <OrbitControls
         enableZoom={false}
         enablePan={false}
-        autoRotate={false}
-        minPolarAngle={Math.PI / 4}
-        maxPolarAngle={Math.PI / 2.2}
+        autoRotate
+        autoRotateSpeed={0.3}
+        minPolarAngle={Math.PI / 3}
+        maxPolarAngle={Math.PI / 2}
       />
     </Canvas>
   );
