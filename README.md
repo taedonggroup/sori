@@ -1,20 +1,36 @@
-# SORI 프로젝트
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-> 태동(TEDONG) × Claude Code 협업 프로젝트
+## Getting Started
 
-## 폴더 구조
+First, run the development server:
 
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
-SORI/
-├── docs/          # 개발 지시 문서 (기획서, 요구사항, 화면설계 등)
-├── assets/        # 이미지, 디자인 파일 등 공유 리소스
-├── CLAUDE.md      # Claude Code 개발 지시서
-├── HANDOFF.md     # AI 간 작업 인계 파일
-└── README.md      # 이 파일
-```
 
-## 파일 공유 방법
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-1. 개발 지시 문서 → `docs/` 폴더에 저장
-2. 이미지/디자인 파일 → `assets/` 폴더에 저장
-3. Claude Code에게 지시할 내용 → `CLAUDE.md` 에 작성
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

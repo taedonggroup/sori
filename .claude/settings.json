@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '명령 실행 전 CLAUDE.md 컨텍스트 유지 중'",
+            "timeout": 3
+          }
+        ]
+      }
+    ]
+  }
+}
