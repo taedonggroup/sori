@@ -1,9 +1,9 @@
 "use client";
 
-// 조각 카드 — 재생, 선택 모드, 닉네임 링크
+// 조각 카드 — 재생, 선택 모드, 인플레이스 확장, 닉네임 링크
 import { useState, useRef } from "react";
 import Link from "next/link";
-import { Play, Pause, Check } from "lucide-react";
+import { Play, Pause, Check, X } from "lucide-react";
 import type { Joakak } from "@/lib/gonmyung/types";
 
 interface JoakakCardProps {
@@ -11,6 +11,8 @@ interface JoakakCardProps {
   selectionMode?: boolean;
   isSelected?: boolean;
   onSelect?: (joakak: Joakak) => void;
+  isExpanded?: boolean;
+  onToggleExpand?: () => void;
 }
 
 export default function JoakakCard({
@@ -18,8 +20,12 @@ export default function JoakakCard({
   selectionMode = false,
   isSelected = false,
   onSelect,
+  isExpanded = false,
+  onToggleExpand,
 }: JoakakCardProps) {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const handlePlayToggle = (e: React.MouseEvent) => {
@@ -40,7 +46,24 @@ export default function JoakakCard({
   const handleCardClick = () => {
     if (selectionMode && onSelect) {
       onSelect(joakak);
+    } else if (!selectionMode && onToggleExpand) {
+      onToggleExpand();
     }
+  };
+
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+    const value = Number(e.target.value);
+    if (audioRef.current) {
+      audioRef.current.currentTime = value;
+      setCurrentTime(value);
+    }
+  };
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
   const formatFileSize = (bytes: number) => {
@@ -51,14 +74,16 @@ export default function JoakakCard({
   return (
     <div
       className={`
-        relative bg-zinc-950 border rounded-2xl p-4 transition-all duration-200
-        ${selectionMode ? "cursor-pointer" : ""}
+        relative bg-zinc-950 border rounded-2xl p-4 transition-all duration-300
+        ${selectionMode || (!isExpanded && onToggleExpand) ? "cursor-pointer" : ""}
         ${isSelected
           ? "border-[#F8F32B] shadow-[0_0_15px_rgba(248,243,43,0.15)]"
-          : "border-zinc-800 hover:border-zinc-600"
+          : isExpanded
+            ? "border-zinc-600"
+            : "border-zinc-800 hover:border-zinc-600"
         }
       `}
-      onClick={handleCardClick}
+      onClick={!isExpanded ? handleCardClick : undefined}
     >
       {/* 선택 오버레이 */}
       {selectionMode && isSelected && (
@@ -67,11 +92,24 @@ export default function JoakakCard({
         </div>
       )}
 
+      {/* 확장 상태 닫기 버튼 */}
+      {isExpanded && !selectionMode && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggleExpand?.(); }}
+          className="absolute top-3 right-3 w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-zinc-700 transition-colors z-10"
+          aria-label="닫기"
+        >
+          <X size={12} className="text-zinc-400" />
+        </button>
+      )}
+
       {/* 오디오 엘리먼트 (숨김) */}
       <audio
         ref={audioRef}
         src={`/api/gonmyung/joakak/${joakak.id}/audio`}
         onEnded={() => setIsPlaying(false)}
+        onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime ?? 0)}
+        onLoadedMetadata={() => setDuration(audioRef.current?.duration ?? 0)}
         preload="none"
       />
 
@@ -93,7 +131,7 @@ export default function JoakakCard({
 
         {/* 파일 정보 */}
         <div className="flex-1 min-w-0 space-y-1.5">
-          <p className="text-white text-sm font-medium truncate">
+          <p className="text-white text-sm font-medium truncate pr-8">
             {joakak.original_filename}
           </p>
 
@@ -135,6 +173,35 @@ export default function JoakakCard({
               {formatFileSize(joakak.file_size)}
             </span>
           </div>
+        </div>
+      </div>
+
+      {/* 확장 영역: 프로그레스바 */}
+      <div
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+          isExpanded ? "max-h-16 mt-3" : "max-h-0"
+        }`}
+      >
+        <input
+          type="range"
+          min={0}
+          max={duration || 1}
+          value={currentTime}
+          onChange={handleSeek}
+          onClick={(e) => e.stopPropagation()}
+          className="w-full h-1 appearance-none rounded-full cursor-pointer
+            [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3
+            [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full
+            [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:cursor-pointer"
+          style={{
+            background: duration
+              ? `linear-gradient(to right, #ffffff ${(currentTime / duration) * 100}%, #3f3f46 ${(currentTime / duration) * 100}%)`
+              : "#3f3f46",
+          }}
+        />
+        <div className="flex justify-between mt-1.5">
+          <span className="text-zinc-600 text-[10px]">{formatTime(currentTime)}</span>
+          <span className="text-zinc-600 text-[10px]">{formatTime(duration)}</span>
         </div>
       </div>
 

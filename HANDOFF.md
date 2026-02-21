@@ -157,6 +157,41 @@ src/
 
 ---
 
+## 2026-02-22 | Claude Code — 사용자 흐름 전면 개선
+
+### 이번 세션 핵심 변경
+
+메인 페이지(`/`)를 3섹션 스크롤 레이아웃에서 **stone/fragments 상태 머신**으로 전면 재작성.
+
+### 변경된 파일
+
+| 파일 | 변경 유형 |
+|------|---------|
+| `src/app/page.tsx` | 전면 재작성 (상태 머신 구조) |
+| `src/components/gonmyung/JoakakCard.tsx` | 인플레이스 확장 + 프로그레스바 추가 |
+| `src/components/gonmyung/JoakakFeed.tsx` | expandedId 내부 상태 관리 추가 |
+| `src/components/gonmyung/UlrimRecommendPanel.tsx` | 신규 생성 (공명 추천 패널) |
+| `src/app/api/gonmyung/recommend/route.ts` | 신규 생성 (Gemini 조합 추천 API) |
+
+### 새로운 사용자 흐름
+
+```
+/ → stone 상태: 원석 3D + 닉네임 입력 + "조각 둘러보기" 버튼
+       ↓ 버튼 클릭 (opacity 크로스페이드)
+   fragments 상태: 조각 그리드 + 장르 필터 + 우하단 미니 원석
+       ↓ 카드 클릭
+   카드 인플레이스 확장 → 프로그레스바 + 시간 표시
+       ↓ "공명 추천" 플로팅 버튼
+   슬라이드업 패널 → Gemini 추천 조합 → 미리듣기 → 울림 확정
+```
+
+### 빌드 현황
+
+- TypeScript 타입 에러: 0개
+- 빌드: 성공 (15개 라우트, 12개 API)
+
+---
+
 ## 2026-02-21 | Claude Code — 1차 개발
 
 ### 작업 내용

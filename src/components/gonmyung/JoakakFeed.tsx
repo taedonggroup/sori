@@ -1,6 +1,6 @@
 "use client";
 
-// 조각 피드 — 무한 스크롤, 장르 필터 탭
+// 조각 피드 — 무한 스크롤, 장르 필터 탭, 인플레이스 확장
 import { useState, useEffect, useCallback, useRef } from "react";
 import JoakakCard from "./JoakakCard";
 import type { Joakak, JoakakListResponse } from "@/lib/gonmyung/types";
@@ -35,6 +35,7 @@ export default function JoakakFeed({
   const [hasNext, setHasNext] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeGenre, setActiveGenre] = useState(genreFilter ?? "");
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const lastCardRef = useRef<HTMLDivElement | null>(null);
 
@@ -60,6 +61,7 @@ export default function JoakakFeed({
   useEffect(() => {
     setJoakakList([]);
     setPage(1);
+    setExpandedId(null);
     fetchJoakak(1, activeGenre, true);
   }, [activeGenre, fetchJoakak]);
 
@@ -82,6 +84,10 @@ export default function JoakakFeed({
 
     return () => observerRef.current?.disconnect();
   }, [hasNext, isLoading, page, activeGenre, fetchJoakak]);
+
+  const handleToggleExpand = (id: string) => {
+    setExpandedId((prev) => (prev === id ? null : id));
+  };
 
   return (
     <div className="space-y-4">
@@ -122,6 +128,8 @@ export default function JoakakFeed({
                 selectionMode={selectionMode}
                 isSelected={selectedIds.includes(joakak.id)}
                 onSelect={onSelectToggle}
+                isExpanded={expandedId === joakak.id}
+                onToggleExpand={() => handleToggleExpand(joakak.id)}
               />
             </div>
           ))}
