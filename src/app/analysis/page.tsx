@@ -22,13 +22,19 @@ const mock결과: 조각분석결과 = {
 function 분석내용() {
   const searchParams = useSearchParams();
   const 조각이름 = searchParams.get("name") ?? "알 수 없는 조각";
+  const 결과파라미터 = searchParams.get("result");
 
-  const [분석중, 분석중설정] = useState(true);
-  const [진행도, 진행도설정] = useState(0);
-  const [결과, 결과설정] = useState<조각분석결과 | null>(null);
+  const [분석중, 분석중설정] = useState(!결과파라미터);
+  const [진행도, 진행도설정] = useState(결과파라미터 ? 100 : 0);
+  const [결과, 결과설정] = useState<조각분석결과 | null>(
+    결과파라미터 ? JSON.parse(결과파라미터) : null
+  );
   const [분석메시지, 분석메시지설정] = useState("공명이 듣고 있습니다...");
 
   useEffect(() => {
+    // 이미 결과가 있으면 로딩 건너뜀
+    if (결과파라미터) return;
+
     const 메시지목록 = [
       "공명이 듣고 있습니다...",
       "리듬을 감지하는 중...",
@@ -49,6 +55,7 @@ function 분석내용() {
       });
     }, 400);
 
+    // 결과 없이 직접 접근한 경우 Mock으로 폴백
     const 타임아웃 = setTimeout(() => {
       clearInterval(메시지인터벌);
       clearInterval(진행인터벌);
@@ -64,7 +71,7 @@ function 분석내용() {
       clearInterval(진행인터벌);
       clearTimeout(타임아웃);
     };
-  }, []);
+  }, [결과파라미터]);
 
   return (
     <div className="relative z-10 w-full max-w-lg space-y-8">

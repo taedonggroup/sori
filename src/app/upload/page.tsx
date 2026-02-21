@@ -57,9 +57,33 @@ export default function 조각업로드() {
     if (!선택된조각) return;
     업로드중설정(true);
 
-    // 파일명을 URL 파라미터로 전달하여 분석 페이지로 이동
-    const params = new URLSearchParams({ name: 선택된조각.name });
-    router.push(`/analysis?${params.toString()}`);
+    try {
+      // 파일을 FormData로 API에 전송
+      const formData = new FormData();
+      formData.append("file", 선택된조각);
+
+      const 응답 = await fetch("/api/공명/analyze", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!응답.ok) {
+        const 에러 = await 응답.json();
+        throw new Error(에러.error ?? "분석에 실패했습니다.");
+      }
+
+      const 결과 = await 응답.json();
+
+      // 분석 결과를 URL 파라미터로 전달
+      const params = new URLSearchParams({
+        name: 선택된조각.name,
+        result: JSON.stringify(결과),
+      });
+      router.push(`/analysis?${params.toString()}`);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "오류가 발생했습니다.");
+      업로드중설정(false);
+    }
   };
 
   return (
