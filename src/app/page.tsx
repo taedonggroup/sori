@@ -32,10 +32,11 @@ export default function 공간() {
           </p>
 
           {/* CTA */}
-          <Link href="/upload">
-            <button className="border border-white/40 text-white rounded-full px-12 py-4 text-sm tracking-widest transition-all duration-300 hover:border-white hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] active:scale-95">
-              조각 올리기
-            </button>
+          <Link
+            href="/upload"
+            className="border border-white/40 text-white rounded-full px-12 py-4 text-sm tracking-widest transition-all duration-300 hover:border-white hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] active:scale-95 inline-block"
+          >
+            조각 올리기
           </Link>
 
           {/* 스크롤 힌트 */}

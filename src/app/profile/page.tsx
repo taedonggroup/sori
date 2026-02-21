@@ -1,10 +1,31 @@
 "use client";
 
 // 원석 프로필 페이지 — 스크롤 없는 원페이지, 3단계 상태 전환
-import { useState } from "react";
+import { Component, useState, type ReactNode, type ErrorInfo } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import ParticleBackground from "@/components/ParticleBackground";
+
+// 3D 렌더링 오류 경계 — GLB 로드 실패 시 폴백
+class StoneErrorBoundary extends Component<
+  { children: ReactNode; fallback: ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: ReactNode; fallback: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error("3D 렌더링 오류:", error, info);
+  }
+  render() {
+    if (this.state.hasError) return this.props.fallback;
+    return this.props.children;
+  }
+}
 
 // Three.js 씬 — SSR 제외 (클라이언트 전용)
 const StoneScene = dynamic(() => import("@/components/3d/StoneScene"), {
@@ -71,9 +92,11 @@ export default function 원석프로필() {
       {/* 파티클 배경 */}
       <ParticleBackground />
 
-      {/* 3D 원석 씬 — 전체 배경 */}
+      {/* 3D 원석 씬 — 전체 배경 (GLB 로드 실패 시 빈 div 폴백) */}
       <div className="absolute inset-0">
-        <StoneScene />
+        <StoneErrorBoundary fallback={<div className="w-full h-full" />}>
+          <StoneScene />
+        </StoneErrorBoundary>
       </div>
 
       {/* 상단 브랜드 */}
@@ -153,7 +176,7 @@ export default function 원석프로필() {
                   className="group flex items-center justify-between p-3 rounded-lg
                     border border-zinc-900 bg-black/60 backdrop-blur-sm
                     hover:border-zinc-700 hover:bg-zinc-900/80
-                    transition-all duration-300 animate-slideInRight cursor-pointer"
+                    transition-all duration-300 animate-slideInRight"
                   style={{ animationDelay: `${i * 60}ms` }}
                 >
                   {/* 순서 + 파일명 */}

@@ -1,17 +1,16 @@
 // 공명 AI 엔진 API Route — Gemini로 음악 파일 직접 분석
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
+import { ALLOWED_EXTENSIONS, MAX_FILE_SIZE } from "@/lib/gonmyung/validation";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY!);
 
-// 지원 형식 목록
-const 지원형식: Record<string, string> = {
-  "mp3": "audio/mp3",
-  "wav": "audio/wav",
-  "flac": "audio/flac",
-  "m4a": "audio/mp4",
-  "aac": "audio/aac",
-  "ogg": "audio/ogg",
+// 확장자 → MIME 타입 매핑
+const MIME_MAP: Record<string, string> = {
+  mp3: "audio/mp3",
+  wav: "audio/wav",
+  flac: "audio/flac",
+  m4a: "audio/mp4",
 };
 
 export async function POST(request: NextRequest) {
@@ -23,18 +22,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "조각 파일이 없습니다." }, { status: 400 });
     }
 
-    // 파일 형식 검증
+    // 파일 형식 검증 (공통 validation 상수 사용)
     const 확장자 = 파일.name.split(".").pop()?.toLowerCase() ?? "";
-    const mimeType = 지원형식[확장자];
-    if (!mimeType) {
+    if (!(ALLOWED_EXTENSIONS as readonly string[]).includes(확장자)) {
       return NextResponse.json(
         { error: "지원하지 않는 형식입니다. mp3, wav, flac, m4a만 가능합니다." },
         { status: 400 }
       );
     }
+    const mimeType = MIME_MAP[확장자];
+    if (!mimeType) {
+      return NextResponse.json(
+        { error: "MIME 타입을 확인할 수 없습니다." },
+        { status: 400 }
+      );
+    }
 
-    // 파일 크기 검증 (25MB)
-    if (파일.size > 25 * 1024 * 1024) {
+    // 파일 크기 검증 (공통 상수 사용)
+    if (파일.size > MAX_FILE_SIZE) {
       return NextResponse.json(
         { error: "파일 크기는 25MB 이하여야 합니다." },
         { status: 400 }
@@ -82,13 +87,35 @@ export async function POST(request: NextRequest) {
 
     const 응답텍스트 = 결과.response.text().trim();
 
-    // JSON 파싱 (마크다운 코드블록 제거)
+    // JSON 파싱 (마크다운 코드블록 제거) — CRITICAL-4: 안전 처리
     const 정제된텍스트 = 응답텍스트
       .replace(/```json\n?/g, "")
       .replace(/```\n?/g, "")
       .trim();
 
-    const 분석결과 = JSON.parse(정제된텍스트);
+    let 분석결과: Record<string, unknown>;
+    try {
+      분석결과 = JSON.parse(정제된텍스트) as Record<string, unknown>;
+    } catch {
+      console.error("Gemini 응답 JSON 파싱 실패:", 정제된텍스트);
+      return NextResponse.json(
+        { error: "분석 결과를 해석할 수 없습니다. 다시 시도해주세요." },
+        { status: 500 }
+      );
+    }
+
+    // 필수 필드 검증
+    if (
+      typeof 분석결과.장르 !== "string" ||
+      !Array.isArray(분석결과.악기) ||
+      typeof 분석결과.BPM !== "number"
+    ) {
+      console.error("Gemini 응답 필수 필드 누락:", 분석결과);
+      return NextResponse.json(
+        { error: "분석 결과가 불완전합니다. 다시 시도해주세요." },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(분석결과);
   } catch (error) {

@@ -22,13 +22,9 @@ export default function ParticleBackground() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // 캔버스 크기를 화면에 맞게 조정
-    const 크기조정 = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    크기조정();
-    window.addEventListener("resize", 크기조정);
+    // 캔버스 초기 크기 설정
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
     // 파티클 생성
     const 파티클목록: 파티클[] = Array.from({ length: 120 }, () => ({
@@ -39,6 +35,17 @@ export default function ParticleBackground() {
       speed: Math.random() * 0.15 + 0.02,
       direction: Math.random() * Math.PI * 2,
     }));
+
+    // 리사이즈 시 캔버스 크기 + 파티클 위치 재초기화
+    const 크기조정 = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      파티클목록.forEach((p) => {
+        p.x = Math.random() * canvas.width;
+        p.y = Math.random() * canvas.height;
+      });
+    };
+    window.addEventListener("resize", 크기조정);
 
     let 애니메이션ID: number;
 

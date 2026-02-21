@@ -171,3 +171,34 @@
 
 .animate-fadeIn { animation: fadeIn 0.5s ease forwards; }
 .animate-slideInRight { animation: slideInRight 0.5s ease forwards; }
+
+/* 공명 엔진 슬라이더 */
+.gonmyung-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2px;
+  background: #27272a;
+  border-radius: 9999px;
+  outline: none;
+}
+
+.gonmyung-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #F8F32B;
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(248, 243, 43, 0.4);
+}
+
+.gonmyung-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #F8F32B;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 6px rgba(248, 243, 43, 0.4);
+}

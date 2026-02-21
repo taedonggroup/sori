@@ -33,6 +33,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# 테스트 샘플 (용량 큼, git 제외)
+public/audio/samples/
+
 # vercel
 .vercel
 

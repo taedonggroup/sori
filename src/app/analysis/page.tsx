@@ -5,7 +5,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import ParticleBackground from "@/components/ParticleBackground";
-import type { 조각분석결과 } from "@/lib/공명/analyze";
+import type { 조각분석결과 } from "@/lib/gonmyung/types";
 
 const mock결과: 조각분석결과 = {
   장르: "Electronic",
@@ -14,6 +14,16 @@ const mock결과: 조각분석결과 = {
   키: "F minor",
   원석_페르소나: ["몽환적", "실험적", "도시적"],
 };
+
+// JSON 문자열을 안전하게 파싱 (CRITICAL-3)
+function safeParseResult(raw: string | null): 조각분석결과 | null {
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as 조각분석결과;
+  } catch {
+    return null;
+  }
+}
 
 // 페르소나 카드 색상 매핑
 const 페르소나색상 = [
@@ -30,7 +40,7 @@ function 분석내용() {
   const [분석중, 분석중설정] = useState(!결과파라미터);
   const [진행도, 진행도설정] = useState(결과파라미터 ? 100 : 0);
   const [결과, 결과설정] = useState<조각분석결과 | null>(
-    결과파라미터 ? JSON.parse(결과파라미터) : null
+    safeParseResult(결과파라미터)
   );
   const [분석메시지, 분석메시지설정] = useState("공명이 듣고 있습니다...");
 
@@ -50,10 +60,11 @@ function 분석내용() {
       분석메시지설정(메시지목록[현재메시지인덱스]);
     }, 1200);
 
+    // 진행도 90%까지 점진 증가 (SUGGEST-5)
     const 진행인터벌 = setInterval(() => {
       진행도설정((이전) => {
-        if (이전 >= 95) return 이전;
-        return 이전 + Math.random() * 8;
+        if (이전 >= 90) return 이전;
+        return 이전 + Math.random() * 6;
       });
     }, 400);
 
@@ -188,15 +199,16 @@ function 분석내용() {
       </div>
 
       {/* 울림 버튼 — 흰 outline + hover glow */}
-      <button
-        className="w-full py-4 rounded-full text-sm tracking-wider
+      <Link
+        href={`/create?genre=${결과?.장르?.toLowerCase() ?? ""}`}
+        className="block w-full py-4 rounded-full text-sm tracking-wider text-center
           border border-white/60 text-white
           transition-all duration-300
           hover:border-white hover:shadow-[0_0_20px_rgba(255,255,255,0.15)]
           active:scale-[0.98]"
       >
         (첫)울림을 만들어보세요
-      </button>
+      </Link>
 
       {/* 다른 조각 분석 링크 */}
       <Link
