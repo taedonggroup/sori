@@ -19,6 +19,13 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
+        // SORI 커스텀 variants
+        "sori-primary":
+          "border border-[#F8F32B]/60 text-[#F8F32B] bg-transparent hover:border-[#F8F32B] hover:shadow-[0_0_20px_rgba(248,243,43,0.15)] active:scale-[0.98]",
+        "sori-outline":
+          "border border-white/60 text-white bg-transparent hover:border-white hover:shadow-[0_0_20px_rgba(255,255,255,0.15)] active:scale-[0.98]",
+        "sori-ghost":
+          "text-zinc-500 bg-transparent hover:text-white",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
@@ -29,6 +36,8 @@ const buttonVariants = cva(
         "icon-xs": "size-6 rounded-md [&_svg:not([class*='size-'])]:size-3",
         "icon-sm": "size-8",
         "icon-lg": "size-10",
+        // SORI 전용 사이즈
+        "sori-lg": "w-full py-4 rounded-full text-sm tracking-wider",
       },
     },
     defaultVariants: {
