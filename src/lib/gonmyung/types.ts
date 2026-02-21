@@ -51,9 +51,51 @@ export interface GenerateResponse {
   outputs: {
     full_mix: string;
     stems: {
-      drums: string;
-      bass: string;
-      melody: string;
+      drums: string | null;
+      bass: string | null;
+      melody: string | null;
     };
   };
+}
+
+// 갤러리 조각 타입
+export interface Joakak {
+  id: string;
+  nickname: string;
+  original_filename: string;
+  genre: string | null;
+  bpm: number | null;
+  key_signature: string | null;
+  instruments: string[];
+  persona: string[];
+  duration: number | null;
+  file_size: number;
+  created_at: string;
+  play_count: number;
+}
+
+export interface JoakakListResponse {
+  joakak: Joakak[];
+  total: number;
+  page: number;
+  has_next: boolean;
+}
+
+export interface ProfileResponse {
+  nickname: string;
+  joakak_count: number;
+  top_personas: string[];
+  joakak: Joakak[];
+}
+
+export interface MixRequest {
+  joakak_ids: string[];
+  duration?: number;
+}
+
+export interface MixResponse {
+  success: boolean;
+  output_url: string;
+  joakak_count: number;
+  duration: number;
 }
