@@ -1,7 +1,7 @@
 // 공명 AI 엔진 — 오디오 파일 검증 유틸리티
 
 export const ALLOWED_EXTENSIONS = ["mp3", "wav", "flac", "m4a"] as const;
-export const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB (Vercel 서버리스 body 제한)
+export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB (Supabase Storage 직접 업로드)
 
 // 오디오 파일 형식 및 크기 검증. 유효하면 null, 아니면 에러 메시지 반환
 export function validateAudioFile(file: File): string | null {

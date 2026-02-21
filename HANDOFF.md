@@ -192,6 +192,59 @@ src/
 
 ---
 
+## 2026-02-22 | Claude Code — 3D 인터랙티브 전면 개편 (단일 Canvas SPA)
+
+### 이번 세션 핵심 변경
+
+전체 앱을 **단일 Three.js Canvas 기반 SPA**로 전면 개편.
+모든 페이지에서 3D 씬이 항상 살아있고, 페이지 이동 시 카메라/원석이 부드럽게 전환됨.
+
+### 신규 파일
+
+| 파일 | 역할 |
+|------|------|
+| `src/store/sceneStore.ts` | Zustand 씬 상태 스토어 (stone/fragments/upload/gallery/profile) |
+| `src/components/3d/CanvasLoader.tsx` | 클라이언트 래퍼 (SSR 비활성화 dynamic import) |
+| `src/components/3d/SoriCanvas.tsx` | 단일 전체화면 Canvas (layout에 고정) |
+| `src/components/3d/Starfield.tsx` | Teal+Gold 2000입자 파티클 시스템 |
+| `src/components/3d/StoneObject.tsx` | 씬별 scale/position/emissive 반응 원석 |
+| `src/components/3d/CameraController.tsx` | useFrame 기반 카메라 lerp + fly-through |
+| `src/components/3d/FragmentParticles.tsx` | 조각 탐색 씬 Teal 발광 구체 60개 |
+| `src/components/3d/UploadOrb.tsx` | 업로드 씬 발광 구체 |
+| `src/components/TransitionOverlay.tsx` | 씬 전환 fade-to-black 오버레이 |
+| `src/components/SceneEffect.tsx` | 페이지 마운트/언마운트 씬 동기화 |
+
+### 수정된 파일
+
+| 파일 | 변경 내용 |
+|------|---------|
+| `src/app/layout.tsx` | CanvasLoader + TransitionOverlay 추가 |
+| `src/app/page.tsx` | Zustand setScene 연동, StoneScene 제거, fly-through 전환 |
+| `src/app/upload/page.tsx` | SceneEffect("upload") 추가, ParticleBackground 제거 |
+| `src/app/gallery/page.tsx` | SceneEffect("gallery") 추가 |
+| `src/app/profile/[nickname]/page.tsx` | SceneEffect("profile") 추가, ProfileBackground 제거 |
+
+### 주요 기술 결정
+
+- **Next.js 16 제약**: 서버 컴포넌트에서 `ssr:false` 직접 사용 불가 → CanvasLoader 클라이언트 래퍼로 해결
+- **씬 아키텍처**: Zustand store (sceneStore) 가 전역 씬 상태 관리, 각 페이지가 마운트 시 setScene 호출
+- **원석 fly-through**: setTransitioning(true) → fade-to-black → setScene → setTransitioning(false) 순서로 500ms 간격 타이밍
+
+### 빌드/배포 현황
+
+- TypeScript 오류: 0개
+- 빌드: 성공 (15개 라우트)
+- 배포: https://sori-bice.vercel.app (2026-02-22)
+
+### 다음 작업 권장사항
+
+- [ ] stone → fragments 카메라 fly-through 시각 확인 (실기기)
+- [ ] upload 씬에서 UploadOrb + HTML 업로드 존 UI 정렬 조정
+- [ ] 원석 StoneObject scale 전환 시 진동 현상 확인
+- [ ] ProfileBackground, StoneScene(구버전) 파일 삭제 정리
+
+---
+
 ## 2026-02-21 | Claude Code — 1차 개발
 
 ### 작업 내용

@@ -43,7 +43,11 @@ export async function uploadAudioToSupabase(file: File): Promise<string> {
 
   if (!uploadResponse.ok) {
     const text = await uploadResponse.text();
-    throw new Error(`Supabase 업로드 실패 (${uploadResponse.status}): ${text}`);
+    // 413: 파일 크기 초과 — 사용자 친화적 메시지
+    if (uploadResponse.status === 400 && text.includes("413")) {
+      throw new Error("파일이 너무 큽니다. 50MB 이하의 파일을 업로드해주세요.");
+    }
+    throw new Error(`업로드에 실패했습니다. (${uploadResponse.status})`);
   }
 
   return publicUrl;

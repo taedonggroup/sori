@@ -23,6 +23,12 @@ export async function POST(request: NextRequest) {
     // 서비스 키로 클라이언트 생성 (RLS 우회)
     const adminSupabase = createClient(supabaseUrl, serviceKey);
 
+    // 버킷 파일 크기 제한 갱신 (50MB) — 기본값이 작을 수 있어 명시적으로 설정
+    await adminSupabase.storage.updateBucket(STORAGE_BUCKET, {
+      public: true,
+      fileSizeLimit: 50 * 1024 * 1024,
+    });
+
     const { data, error } = await adminSupabase.storage
       .from(STORAGE_BUCKET)
       .createSignedUploadUrl(path);

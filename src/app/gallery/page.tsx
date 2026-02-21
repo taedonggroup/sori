@@ -1,9 +1,11 @@
 "use client";
 
 // 조각 갤러리 — 커뮤니티 조각 피드 + 선택→공명 믹스
+// 3D 배경은 SoriCanvas(layout)에서 담당
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import SceneEffect from "@/components/SceneEffect";
 import JoakakFeed from "@/components/gonmyung/JoakakFeed";
 import MixSelector from "@/components/gonmyung/MixSelector";
 import ResonanceLoader from "@/components/gonmyung/ResonanceLoader";
@@ -57,7 +59,10 @@ export default function 갤러리() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen bg-transparent text-white">
+      {/* gallery 씬으로 전환 — 원석 소형화 우측 배치 */}
+      <SceneEffect scene="gallery" />
+
       {/* 공명 로딩 오버레이 */}
       <ResonanceLoader
         isLoading={isMixing}

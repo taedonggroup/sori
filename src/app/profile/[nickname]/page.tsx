@@ -1,7 +1,8 @@
 // 원석 프로필 동적 라우트 — 서버사이드 렌더링 (SEO)
+// 3D 배경은 SoriCanvas(layout)에서 담당 — profile 씬 강한 발광
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import ProfileBackground from "@/components/gonmyung/ProfileBackground";
+import SceneEffect from "@/components/SceneEffect";
 import ProfileCard from "@/components/gonmyung/ProfileCard";
 import type { ProfileResponse } from "@/lib/gonmyung/types";
 
@@ -30,9 +31,9 @@ export default async function 원석프로필페이지({ params }: ProfilePagePr
   const profile = await getProfile(decodedNickname);
 
   return (
-    <main className="min-h-screen bg-black text-white overflow-x-hidden relative">
-      {/* 3D 배경 + 파티클 (클라이언트 컴포넌트) */}
-      <ProfileBackground />
+    <main className="min-h-screen bg-transparent text-white overflow-x-hidden relative">
+      {/* profile 씬으로 전환 — 원석 대형화 + 강한 내부 발광 */}
+      <SceneEffect scene="profile" />
 
       {/* 상단 브랜드 */}
       <header className="fixed top-0 left-0 z-20 p-6 md:p-8">

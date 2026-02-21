@@ -1,9 +1,10 @@
 "use client";
 
 // 조각 업로드 페이지 — Supabase 직접 업로드 → Gemini 분석 인라인 표시 → 갤러리 저장
+// 3D 배경은 SoriCanvas(layout)에서 담당 + UploadOrb 발광 구체 표시
 import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import ParticleBackground from "@/components/ParticleBackground";
+import SceneEffect from "@/components/SceneEffect";
 import NicknameInput from "@/components/gonmyung/NicknameInput";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -159,6 +160,14 @@ export default function 조각업로드() {
       const response = await fetch(samplePath);
       const blob = await response.blob();
       const file = new File([blob], `${sampleTitle}.mp3`, { type: "audio/mpeg" });
+      // 샘플도 파일 크기 검증 (validation과 동일한 기준)
+      const validationError = validateAudioFile(file);
+      if (validationError) {
+        에러메시지설정(validationError);
+        분석중설정(false);
+        진행단계설정("");
+        return;
+      }
       선택된조각설정(file);
       await 공명에게들려주기(file);
     } catch {
@@ -206,8 +215,9 @@ export default function 조각업로드() {
   const 로딩중 = 분석중 || 업로드중;
 
   return (
-    <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4 py-16 relative overflow-hidden">
-      <ParticleBackground />
+    <main className="min-h-screen bg-transparent text-white flex flex-col items-center justify-center px-4 py-16 relative overflow-hidden">
+      {/* upload 씬으로 전환 — UploadOrb 발광 구체 활성화 */}
+      <SceneEffect scene="upload" />
 
       <div className="relative z-10 w-full max-w-lg flex flex-col items-center space-y-8">
         {/* 헤더 */}
