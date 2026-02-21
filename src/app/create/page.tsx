@@ -1,168 +1,75 @@
 "use client";
 
-// (첫)울림 만들기 — 공명 AI 엔진으로 음악 생성
-import { useState, useEffect, useCallback, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+// (첫)울림 만들기 — 갤러리에서 조각 선택 → FFmpeg amix 믹스
+import { useState, useCallback, Suspense } from "react";
 import Link from "next/link";
 import ParticleBackground from "@/components/ParticleBackground";
-import GenreGrid from "@/components/gonmyung/GenreGrid";
-import ParameterControls from "@/components/gonmyung/ParameterControls";
+import { Button } from "@/components/ui/button";
+import JoakakFeed from "@/components/gonmyung/JoakakFeed";
+import MixSelector from "@/components/gonmyung/MixSelector";
 import ResonanceLoader from "@/components/gonmyung/ResonanceLoader";
 import ResultPanel from "@/components/gonmyung/ResultPanel";
-import { GONMYUNG_PRESETS } from "@/lib/gonmyung/presets";
-import { GENRE_SAMPLE_MAP } from "@/lib/gonmyung/samples";
-import type { GenerateResponse } from "@/lib/gonmyung/types";
-
-const API_URL = process.env.NEXT_PUBLIC_GONMYUNG_API_URL;
-
-const LOADING_STEPS = [
-  "흩어진 조각들을 수집하는 중...",
-  "공명의 주파수를 맞추는 중...",
-  "[MusicGen] 음악 생성 중...",
-  "마스터링 프리셋 적용 중...",
-  "[Demucs] 스템 분리 중...",
-  "공명이 울립니다",
-];
-
-function createMockResult(genre: string, duration: number, mood: string): GenerateResponse {
-  const preset = GONMYUNG_PRESETS.find((p) => p.genre === genre) ?? GONMYUNG_PRESETS[0];
-  return {
-    success: true,
-    genre,
-    mood,
-    duration,
-    preset_applied: preset.name,
-    preset_eq: preset.eq,
-    preset_reverb: preset.reverb,
-    mode: "simulation",
-    outputs: {
-      full_mix: GENRE_SAMPLE_MAP[genre] ?? "/audio/test/full_mix.wav",
-      stems: {
-        drums: "/audio/test/stem_drums.wav",
-        bass: "/audio/test/stem_bass.wav",
-        melody: "/audio/test/stem_melody.wav",
-      },
-    },
-  };
-}
+import type { Joakak, MixResponse, GenerateResponse } from "@/lib/gonmyung/types";
 
 function CreateContent() {
-  const searchParams = useSearchParams();
-  const genreParam = searchParams.get("genre");
-
-  const [selectedGenre, setSelectedGenre] = useState("kpop");
-  const [duration, setDuration] = useState(10);
-  const [intensity, setIntensity] = useState(7);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [currentStep, setCurrentStep] = useState("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isMixing, setIsMixing] = useState(false);
   const [result, setResult] = useState<GenerateResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // URL 쿼리 파라미터로 장르 초기값 설정
-  useEffect(() => {
-    if (!genreParam) return;
-    const matchedPreset = GONMYUNG_PRESETS.find(
-      (p) => p.genre === genreParam.toLowerCase()
+  const handleSelectToggle = useCallback((joakak: Joakak) => {
+    setSelectedIds((prev) =>
+      prev.includes(joakak.id)
+        ? prev.filter((id) => id !== joakak.id)
+        : [...prev, joakak.id]
     );
-    if (matchedPreset) {
-      setSelectedGenre(matchedPreset.genre);
-    }
-  }, [genreParam]);
+  }, []);
 
-  const runSimulation = useCallback(
-    (genre: string, dur: number) => {
-      const preset = GONMYUNG_PRESETS.find((p) => p.genre === genre) ?? GONMYUNG_PRESETS[0];
-      const mood = preset.mood;
-      let stepIndex = 0;
-
-      const stepInterval = setInterval(() => {
-        stepIndex++;
-        if (stepIndex < LOADING_STEPS.length) {
-          setCurrentStep(LOADING_STEPS[stepIndex]);
-          setProgress((stepIndex / (LOADING_STEPS.length - 1)) * 100);
-        }
-      }, 500);
-
-      setCurrentStep(LOADING_STEPS[0]);
-      setProgress(0);
-
-      setTimeout(() => {
-        clearInterval(stepInterval);
-        setProgress(100);
-        setCurrentStep(LOADING_STEPS[LOADING_STEPS.length - 1]);
-
-        setTimeout(() => {
-          setResult(createMockResult(genre, dur, mood));
-          setIsGenerating(false);
-        }, 400);
-      }, 3000);
-
-      return () => clearInterval(stepInterval);
-    },
-    []
-  );
-
-  const handleGenerate = useCallback(async () => {
-    setIsGenerating(true);
-    setResult(null);
-    setProgress(0);
+  const handleMix = useCallback(async () => {
+    if (selectedIds.length < 2) return;
+    setIsMixing(true);
     setErrorMessage(null);
 
-    const preset = GONMYUNG_PRESETS.find((p) => p.genre === selectedGenre) ?? GONMYUNG_PRESETS[0];
-    const mood = preset.mood;
-
-    if (!API_URL) {
-      if (process.env.NODE_ENV === "production") {
-        setErrorMessage("공명 API가 설정되지 않았습니다. 관리자에게 문의해주세요.");
-        setIsGenerating(false);
-        return;
-      }
-      runSimulation(selectedGenre, duration);
-      return;
-    }
-
     try {
-      setCurrentStep(LOADING_STEPS[0]);
-      const response = await fetch(`${API_URL}/api/generate`, {
+      const response = await fetch("/api/gonmyung/mix", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          genre: selectedGenre,
-          duration,
-          intensity,
-          mood,
-        }),
+        body: JSON.stringify({ joakak_ids: selectedIds }),
       });
 
       if (!response.ok) {
-        throw new Error(`API 오류: ${response.status}`);
+        throw new Error(`믹스 실패: ${response.status}`);
       }
 
-      const data = (await response.json()) as GenerateResponse;
-      setProgress(100);
-      setCurrentStep(LOADING_STEPS[LOADING_STEPS.length - 1]);
+      const data = (await response.json()) as MixResponse;
 
-      setTimeout(() => {
-        setResult(data);
-        setIsGenerating(false);
-      }, 400);
+      // MixResponse → ResultPanel용 GenerateResponse 형태로 변환
+      setResult({
+        success: true,
+        genre: `${selectedIds.length}개 조각 믹스`,
+        mood: "공명",
+        duration: data.duration,
+        preset_applied: "FFmpeg amix",
+        preset_eq: { low: 5, mid: 5, high: 5 },
+        preset_reverb: 0.5,
+        mode: "ai",
+        outputs: {
+          full_mix: data.output_url,
+          stems: { drums: null, bass: null, melody: null },
+        },
+      });
     } catch (error) {
-      console.error("공명 API 오류:", error instanceof Error ? error.message : error);
-      // 개발환경이면 시뮬레이션 폴백, 프로덕션이면 에러 표시
-      if (process.env.NODE_ENV === "development") {
-        runSimulation(selectedGenre, duration);
-      } else {
-        setErrorMessage("공명 생성에 실패했습니다. 잠시 후 다시 시도해주세요.");
-        setIsGenerating(false);
-      }
+      setErrorMessage(
+        error instanceof Error ? error.message : "공명 믹스에 실패했습니다."
+      );
+    } finally {
+      setIsMixing(false);
     }
-  }, [selectedGenre, duration, intensity, runSimulation]);
+  }, [selectedIds]);
 
   const handleReset = useCallback(() => {
     setResult(null);
-    setProgress(0);
-    setCurrentStep("");
+    setSelectedIds([]);
     setErrorMessage(null);
   }, []);
 
@@ -170,14 +77,14 @@ function CreateContent() {
     <>
       {/* 공명 로딩 오버레이 */}
       <ResonanceLoader
-        isLoading={isGenerating}
-        progress={progress}
-        currentStep={currentStep}
+        isLoading={isMixing}
+        progress={isMixing ? 50 : 0}
+        currentStep="조각들을 공명으로 믹싱하는 중..."
       />
 
-      <div className="relative z-10 max-w-3xl mx-auto px-6 py-16">
+      <div className="relative z-10 max-w-3xl mx-auto px-6 py-16 pb-32">
         {/* 헤더 */}
-        <header className="text-center mb-12 space-y-3 animate-fadeInUp">
+        <header className="text-center mb-10 space-y-3 animate-fadeInUp">
           <Link href="/" className="inline-block">
             <h2 className="text-zinc-600 text-xs tracking-[0.4em] uppercase hover:text-zinc-400 transition-colors">
               SORI
@@ -187,83 +94,72 @@ function CreateContent() {
             (첫)울림 만들기
           </h1>
           <p className="text-zinc-500 text-sm font-light">
-            K-Content에 특화된 공명이 당신의 조각으로 울림을 만듭니다
+            조각을 선택해 공명이 믹스합니다
           </p>
         </header>
 
-        {/* 에러 메시지 영역 */}
+        {/* 에러 메시지 */}
         {errorMessage && (
           <div className="mb-6 p-4 bg-red-950/50 border border-red-800/50 rounded-xl text-center animate-fadeInUp">
             <p className="text-red-400 text-sm">{errorMessage}</p>
           </div>
         )}
 
-        {!result ? (
-          <div className="space-y-8">
-            {/* 패널 01: 장르 선택 */}
-            <section
-              className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 space-y-4 animate-fadeInUp"
-              style={{ animationDelay: "0.1s" }}
-            >
-              <p className="text-zinc-500 text-xs tracking-[0.3em] uppercase">
-                01 — 장르 선택
+        {result ? (
+          /* 결과 패널 */
+          <div className="space-y-6">
+            <div className="text-center">
+              <p className="text-zinc-500 text-xs tracking-[0.3em] uppercase mb-2">공명 완료</p>
+              <p className="text-zinc-400 text-sm">
+                {selectedIds.length}개의 조각이 하나의 울림이 되었습니다
               </p>
-              <GenreGrid
-                presets={GONMYUNG_PRESETS}
-                selectedGenre={selectedGenre}
-                onSelect={setSelectedGenre}
-              />
-            </section>
-
-            {/* 패널 02: 파라미터 */}
-            <section
-              className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 space-y-4 animate-fadeInUp"
-              style={{ animationDelay: "0.2s" }}
-            >
-              <p className="text-zinc-500 text-xs tracking-[0.3em] uppercase">
-                02 — 파라미터
-              </p>
-              <ParameterControls
-                duration={duration}
-                intensity={intensity}
-                onDurationChange={setDuration}
-                onIntensityChange={setIntensity}
-              />
-            </section>
-
-            {/* 생성 버튼 */}
-            <div
-              className="animate-fadeInUp"
-              style={{ animationDelay: "0.3s" }}
-            >
-              <button
-                onClick={handleGenerate}
-                disabled={isGenerating}
-                className="w-full py-4 rounded-full text-sm tracking-wider
-                  border border-[#F8F32B]/60 text-[#F8F32B]
-                  transition-all duration-300
-                  hover:border-[#F8F32B] hover:shadow-[0_0_20px_rgba(248,243,43,0.15)]
-                  active:scale-[0.98]
-                  disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                공명 생성
-              </button>
+            </div>
+            <ResultPanel result={result} onReset={handleReset} />
+            <div className="text-center">
+              <Button variant="sori-ghost" asChild>
+                <Link href="/gallery">갤러리로 돌아가기</Link>
+              </Button>
             </div>
           </div>
         ) : (
-          <ResultPanel result={result} onReset={handleReset} />
+          /* 조각 선택 피드 */
+          <div className="space-y-4 animate-fadeInUp" style={{ animationDelay: "0.1s" }}>
+            {selectedIds.length === 0 ? (
+              <p className="text-zinc-600 text-xs text-center">
+                아래에서 조각을 2개 이상 선택하면 공명이 믹스합니다
+              </p>
+            ) : (
+              <p className="text-zinc-500 text-xs text-center">
+                {selectedIds.length}개 선택됨 — 2개 이상이면 믹스 패널이 나타납니다
+              </p>
+            )}
+
+            <JoakakFeed
+              selectionMode
+              selectedIds={selectedIds}
+              onSelectToggle={handleSelectToggle}
+            />
+          </div>
         )}
 
-        {/* 돌아가기 링크 */}
-        <div className="mt-8 text-center">
-          <Link
-            href="/upload"
-            className="text-zinc-600 text-sm hover:text-zinc-400 transition-colors"
-          >
-            조각 업로드로 돌아가기
-          </Link>
-        </div>
+        {/* 갤러리 링크 */}
+        {!result && (
+          <div className="mt-8 text-center">
+            <Button variant="sori-ghost" className="text-sm" asChild>
+              <Link href="/gallery">갤러리로 돌아가기</Link>
+            </Button>
+          </div>
+        )}
       </div>
+
+      {/* 믹스 선택 패널 */}
+      {!result && (
+        <MixSelector
+          selectedIds={selectedIds}
+          onMix={handleMix}
+          isMixing={isMixing}
+        />
+      )}
     </>
   );
 }

@@ -1,6 +1,8 @@
 "use client";
 
 // 공명 엔진 — 파라미터 슬라이더 (길이, 공명 강도)
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 
 interface ParameterControlsProps {
   duration: number;
@@ -20,25 +22,19 @@ export default function ParameterControls({
       {/* 길이 슬라이더 */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <label htmlFor="gonmyung-duration" className="text-zinc-500 text-xs tracking-[0.2em] uppercase">
+          <Label className="text-muted-foreground text-xs tracking-[0.2em] uppercase">
             길이
-          </label>
+          </Label>
           <span className="text-[#F8F32B] text-sm font-medium tabular-nums">
             {duration}초
           </span>
         </div>
-        <input
-          id="gonmyung-duration"
-          type="range"
+        <Slider
           min={5}
           max={30}
-          value={duration}
-          onChange={(event) => onDurationChange(Number(event.target.value))}
-          aria-valuemin={5}
-          aria-valuemax={30}
-          aria-valuenow={duration}
-          aria-valuetext={`${duration}초`}
-          className="gonmyung-slider w-full"
+          value={[duration]}
+          onValueChange={([value]) => onDurationChange(value)}
+          aria-label="길이"
         />
         <div className="flex justify-between text-zinc-700 text-[10px]">
           <span>5초</span>
@@ -49,25 +45,19 @@ export default function ParameterControls({
       {/* 공명 강도 슬라이더 */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <label htmlFor="gonmyung-intensity" className="text-zinc-500 text-xs tracking-[0.2em] uppercase">
+          <Label className="text-muted-foreground text-xs tracking-[0.2em] uppercase">
             공명 강도
-          </label>
+          </Label>
           <span className="text-[#F8F32B] text-sm font-medium tabular-nums">
             {intensity}
           </span>
         </div>
-        <input
-          id="gonmyung-intensity"
-          type="range"
+        <Slider
           min={1}
           max={10}
-          value={intensity}
-          onChange={(event) => onIntensityChange(Number(event.target.value))}
-          aria-valuemin={1}
-          aria-valuemax={10}
-          aria-valuenow={intensity}
-          aria-valuetext={`강도 ${intensity}`}
-          className="gonmyung-slider w-full"
+          value={[intensity]}
+          onValueChange={([value]) => onIntensityChange(value)}
+          aria-label="공명 강도"
         />
         <div className="flex justify-between text-zinc-700 text-[10px]">
           <span>약</span>
