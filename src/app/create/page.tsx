@@ -61,7 +61,7 @@ export default function CreatePage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white">
+    <main className="min-h-screen bg-black text-white">
       {/* 공명 로딩 오버레이 */}
       <ResonanceLoader
         isLoading={isMixing}
@@ -69,26 +69,19 @@ export default function CreatePage() {
         currentStep="조각들을 공명으로 믹싱하는 중..."
       />
 
-      <div className="max-w-3xl mx-auto px-6 py-16 pb-32">
-        {/* 헤더 */}
-        <header className="text-center mb-10 space-y-3">
-          <Link
-            href="/"
-            className="text-zinc-500 text-sm hover:text-zinc-300 transition-colors"
-          >
-            ← 공간으로
-          </Link>
-          <h1 className="text-2xl font-light text-white tracking-tight">
-            (첫)울림 만들기
-          </h1>
-          <p className="text-zinc-500 text-sm font-light">
-            조각을 선택해 공명이 믹스합니다
-          </p>
-        </header>
+      {/* 헤더 */}
+      <header className="border-b border-zinc-900 px-4 sm:px-6 py-4 sm:py-5 mb-8">
+        <div className="max-w-3xl mx-auto">
+          <p className="text-zinc-600 text-[10px] tracking-[0.5em] uppercase mb-1">SORI / 공명</p>
+          <h1 className="text-white text-lg font-light tracking-widest">(첫)울림 만들기</h1>
+          <p className="text-zinc-600 text-xs tracking-[0.2em] mt-1">조각을 2개 이상 선택하면 공명이 믹스합니다</p>
+        </div>
+      </header>
 
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 pb-28 sm:pb-8">
         {/* 에러 메시지 */}
         {errorMessage && (
-          <div className="mb-6 p-4 bg-red-950/50 border border-red-800/50 rounded-xl text-center">
+          <div className="mb-6 p-4 bg-black border border-red-900 text-center">
             <p className="text-red-400 text-sm">{errorMessage}</p>
           </div>
         )}
@@ -97,17 +90,17 @@ export default function CreatePage() {
           /* 결과 */
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <p className="text-zinc-500 text-xs tracking-[0.3em] uppercase">
+              <p className="text-zinc-600 text-[10px] tracking-[0.5em] uppercase">
                 공명 완료
               </p>
-              <p className="text-zinc-400 text-sm">
+              <p className="text-zinc-400 text-sm tracking-[0.2em]">
                 {mixResult.joakakCount}개의 조각이 하나의 울림이 되었습니다
               </p>
             </div>
 
             {/* 울림 플레이어 */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4">
-              <p className="text-zinc-500 text-xs tracking-[0.3em] uppercase text-center">
+            <div className="bg-black border border-zinc-900 p-6 space-y-4">
+              <p className="text-zinc-600 text-[10px] tracking-[0.5em] uppercase text-center">
                 울림
               </p>
               <audio
@@ -115,21 +108,21 @@ export default function CreatePage() {
                 src={mixResult.outputUrl}
                 className="w-full"
               />
-              <p className="text-zinc-700 text-xs text-center">
+              <p className="text-zinc-700 text-xs text-center font-mono">
                 재생 시간: {Math.round(mixResult.duration)}초
               </p>
             </div>
 
-            <div className="flex justify-center gap-3">
+            <div className="flex justify-center gap-4">
               <button
                 onClick={handleReset}
-                className="text-zinc-400 hover:text-zinc-200 px-4 py-2 rounded-lg transition-colors"
+                className="text-zinc-600 text-xs tracking-[0.2em] py-3 px-4 hover:text-zinc-300 transition-colors uppercase"
               >
-                다시 선택하기
+                다시 선택
               </button>
               <Link
                 href="/gallery"
-                className="border border-zinc-700 hover:border-zinc-500 text-zinc-300 px-4 py-2 rounded-lg transition-colors"
+                className="border border-zinc-800 text-zinc-400 text-xs tracking-[0.2em] py-3 px-5 hover:border-zinc-600 hover:text-zinc-200 transition-all uppercase"
               >
                 갤러리로
               </Link>
@@ -138,7 +131,7 @@ export default function CreatePage() {
         ) : (
           /* 조각 선택 피드 */
           <div className="space-y-4">
-            <p className="text-zinc-600 text-xs text-center">
+            <p className="text-zinc-700 text-[10px] tracking-[0.2em] text-center">
               {selectedIds.length === 0
                 ? "아래에서 조각을 2개 이상 선택하면 공명이 믹스합니다"
                 : `${selectedIds.length}개 선택됨 — 2개 이상이면 믹스 패널이 나타납니다`}
@@ -155,7 +148,7 @@ export default function CreatePage() {
           <div className="mt-8 text-center">
             <Link
               href="/gallery"
-              className="text-zinc-400 hover:text-zinc-200 px-4 py-2 rounded-lg text-sm transition-colors"
+              className="text-zinc-600 text-xs tracking-[0.2em] hover:text-zinc-300 transition-colors uppercase"
             >
               갤러리로 돌아가기
             </Link>

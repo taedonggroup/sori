@@ -56,7 +56,7 @@ export default function 갤러리() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white">
+    <main className="min-h-screen bg-black text-white">
       {/* 공명 로딩 오버레이 */}
       <ResonanceLoader
         isLoading={isMixing}
@@ -64,41 +64,38 @@ export default function 갤러리() {
         currentStep="조각들을 공명으로 믹싱하는 중..."
       />
 
-      <div className="max-w-3xl mx-auto px-4 py-8 pb-32">
-        {/* 헤더 */}
-        <header className="flex items-center justify-between mb-8">
+      {/* 헤더 */}
+      <header className="border-b border-zinc-900 px-4 sm:px-6 py-4 sm:py-5">
+        <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div>
-            <Link
-              href="/"
-              className="text-zinc-500 text-sm hover:text-zinc-300 flex items-center gap-1 mb-2 transition-colors"
-            >
-              ← 공간으로
-            </Link>
-            <h1 className="text-2xl font-semibold text-white">조각 갤러리</h1>
+            <p className="text-zinc-600 text-[10px] tracking-[0.5em] uppercase mb-1">SORI</p>
+            <h1 className="text-white text-lg font-light tracking-widest">조각 갤러리</h1>
           </div>
           <Link
             href="/upload"
-            className="bg-teal-600 hover:bg-teal-500 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+            className="border border-zinc-800 text-zinc-400 text-xs tracking-[0.2em] px-4 py-2.5 hover:border-zinc-600 hover:text-zinc-200 transition-all uppercase"
           >
-            조각 올리기
+            올리기
           </Link>
-        </header>
+        </div>
+      </header>
 
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 pb-28 sm:pb-8">
         {/* 믹스 결과 */}
         {mixResult ? (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <p className="text-zinc-500 text-xs tracking-[0.3em] uppercase">
+              <p className="text-zinc-600 text-[10px] tracking-[0.5em] uppercase">
                 공명 완료
               </p>
-              <h2 className="text-xl font-light text-white">
+              <h2 className="text-xl font-light text-white tracking-widest">
                 {mixResult.joakakCount}개의 조각이 하나의 울림이 되었습니다
               </h2>
             </div>
 
             {/* 울림 플레이어 */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4">
-              <p className="text-zinc-500 text-xs tracking-[0.3em] uppercase text-center">
+            <div className="bg-black border border-zinc-900 p-6 space-y-4">
+              <p className="text-zinc-600 text-[10px] tracking-[0.5em] uppercase text-center">
                 울림
               </p>
               <audio
@@ -106,21 +103,21 @@ export default function 갤러리() {
                 src={mixResult.outputUrl}
                 className="w-full"
               />
-              <p className="text-zinc-700 text-xs text-center">
+              <p className="text-zinc-700 text-xs text-center font-mono">
                 재생 시간: {Math.round(mixResult.duration)}초
               </p>
             </div>
 
-            <div className="flex justify-center gap-3">
+            <div className="flex justify-center gap-4">
               <button
                 onClick={handleReset}
-                className="text-zinc-400 hover:text-zinc-200 px-4 py-2 rounded-lg transition-colors"
+                className="text-zinc-600 text-xs tracking-[0.2em] py-3 px-4 hover:text-zinc-300 transition-colors uppercase"
               >
-                다시 선택하기
+                다시 선택
               </button>
               <Link
                 href="/"
-                className="border border-zinc-700 hover:border-zinc-500 text-zinc-300 px-4 py-2 rounded-lg transition-colors"
+                className="border border-zinc-800 text-zinc-400 text-xs tracking-[0.2em] py-3 px-5 hover:border-zinc-600 hover:text-zinc-200 transition-all uppercase"
               >
                 공간으로
               </Link>
@@ -129,7 +126,7 @@ export default function 갤러리() {
         ) : (
           <>
             {/* 선택 안내 */}
-            <p className="text-zinc-700 text-xs text-center mb-4">
+            <p className="text-zinc-700 text-[10px] tracking-[0.2em] text-center mb-4">
               {selectedIds.length === 0
                 ? "조각을 선택해 공명으로 믹스하거나, 재생 버튼으로 들어보세요"
                 : `${selectedIds.length}개 선택됨 — 2개 이상 선택하면 믹스 버튼이 나타납니다`}

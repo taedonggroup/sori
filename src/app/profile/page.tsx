@@ -1,7 +1,7 @@
 "use client";
 
 // 원석 프로필 페이지 — 스크롤 없는 원페이지, 3단계 상태 전환
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 // --- 목 데이터 (추후 API 연동) ---
@@ -48,8 +48,8 @@ export default function 원석프로필() {
   // 하단 버튼 텍스트
   const getButtonLabel = (): string => {
     switch (currentState) {
-      case "기본": return "페르소나 보기 →";
-      case "페르소나": return "조각 보기 →";
+      case "기본": return "페르소나 보기";
+      case "페르소나": return "조각 보기";
       case "조각목록": return "처음으로";
     }
   };
@@ -59,31 +59,34 @@ export default function 원석프로필() {
   const remainingCount = 조각목록.length - visibleFragments.length;
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white overflow-x-hidden relative">
+    <main className="min-h-screen bg-black text-white overflow-x-hidden relative">
       {/* 상단 브랜드 */}
-      <header className="fixed top-0 left-0 z-20 p-6 md:p-8">
-        <Link
-          href="/"
-          className="text-zinc-500 text-sm hover:text-zinc-300 transition-colors"
-        >
-          ← SORI
-        </Link>
+      <header className="fixed top-0 left-0 right-0 z-20 border-b border-zinc-900 px-4 sm:px-6 py-4">
+        <div className="max-w-2xl mx-auto flex items-center justify-between">
+          <Link
+            href="/"
+            className="text-zinc-600 text-[10px] tracking-[0.5em] uppercase hover:text-zinc-400 transition-colors"
+          >
+            SORI
+          </Link>
+          <p className="text-zinc-700 text-[10px] tracking-[0.3em] uppercase">원석 프로필</p>
+        </div>
       </header>
 
       {/* UI 오버레이 */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 pb-24">
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 pb-28 sm:pb-10">
 
         {/* 상태 1 — 기본 */}
         {currentState === "기본" && (
           <div key="기본" className="flex flex-col items-center text-center">
-            <p className="text-zinc-500 text-xs tracking-[0.4em] uppercase mb-4">
-              원석 프로필
+            <p className="text-zinc-600 text-[10px] tracking-[0.5em] uppercase mb-4">
+              01 — 기본 정보
             </p>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-light tracking-[0.25em] uppercase text-white">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-thin tracking-[0.25em] uppercase text-white">
               {닉네임}
             </h1>
-            <p className="mt-4 text-sm tracking-[0.2em] text-zinc-500">
-              {가입일} 합류 &nbsp;·&nbsp; 조각 {조각수}개
+            <p className="mt-4 text-sm tracking-[0.2em] text-zinc-600 font-light">
+              {가입일} 합류 &nbsp;/&nbsp; 조각 {조각수}개
             </p>
           </div>
         )}
@@ -91,10 +94,10 @@ export default function 원석프로필() {
         {/* 상태 2 — 페르소나 */}
         {currentState === "페르소나" && (
           <div key="페르소나" className="flex flex-col items-center text-center max-w-2xl">
-            <p className="text-zinc-600 text-xs tracking-[0.4em] uppercase mb-3">
-              원석의 정체성
+            <p className="text-zinc-600 text-[10px] tracking-[0.5em] uppercase mb-3">
+              02 — 원석의 정체성
             </p>
-            <h2 className="text-2xl font-light text-white tracking-tight mb-10">
+            <h2 className="text-xl font-light text-white tracking-widest mb-10">
               공명이 발견한 당신의 소리
             </h2>
 
@@ -103,17 +106,16 @@ export default function 원석프로필() {
               {페르소나.map((키워드) => (
                 <span
                   key={키워드}
-                  className="px-5 py-2.5 border border-teal-600/25 text-zinc-400 text-sm rounded-full
+                  className="px-5 py-2.5 border border-zinc-800 text-zinc-400 text-sm
                     cursor-default transition-all duration-500
-                    hover:border-teal-600/60 hover:text-white
-                    hover:shadow-[0_0_20px_rgba(13,148,136,0.15)]"
+                    hover:border-teal-600/60 hover:text-white"
                 >
                   {키워드}
                 </span>
               ))}
             </div>
 
-            <p className="mt-8 text-zinc-700 text-xs tracking-wider">
+            <p className="mt-8 text-zinc-700 text-[10px] tracking-[0.3em]">
               {조각수}개의 조각이 만들어낸 정체성
             </p>
           </div>
@@ -122,40 +124,30 @@ export default function 원석프로필() {
         {/* 상태 3 — 조각목록 */}
         {currentState === "조각목록" && (
           <div key="조각목록" className="flex flex-col items-center w-full max-w-xl">
-            <p className="text-zinc-600 text-xs tracking-[0.4em] uppercase mb-3">
-              조각 아카이브
+            <p className="text-zinc-600 text-[10px] tracking-[0.5em] uppercase mb-3">
+              03 — 조각 아카이브
             </p>
-            <h2 className="text-2xl font-light text-white tracking-tight mb-8">
+            <h2 className="text-xl font-light text-white tracking-widest mb-8">
               공명에게 들려준 조각들
             </h2>
 
             {/* 조각 리스트 (최대 5개) */}
-            <div className="w-full space-y-2">
+            <div className="w-full">
               {visibleFragments.map((조각, i) => (
                 <div
                   key={조각.id}
-                  className="group flex items-center justify-between p-3 rounded-lg
-                    border border-zinc-800 bg-zinc-900
-                    hover:border-zinc-700 hover:bg-zinc-800
-                    transition-all duration-300"
+                  className="border-b border-zinc-900 py-3 flex items-center gap-4 hover:bg-zinc-900/30 px-2 transition-colors"
                 >
-                  {/* 순서 + 파일명 */}
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-zinc-700 text-xs font-mono w-5 shrink-0">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <p className="text-zinc-300 text-sm truncate group-hover:text-white transition-colors">
-                      {조각.이름}
-                    </p>
-                  </div>
-
-                  {/* 분석 태그 — 모바일에서 BPM/키 숨김 */}
-                  <div className="flex items-center gap-2 shrink-0 ml-4">
-                    <span className="text-zinc-500 text-xs">{조각.장르}</span>
-                    <span className="text-zinc-800 text-xs hidden sm:inline">·</span>
-                    <span className="text-zinc-500 text-xs hidden sm:inline">{조각.BPM}</span>
-                    <span className="text-zinc-800 text-xs hidden sm:inline">·</span>
-                    <span className="text-zinc-500 text-xs hidden sm:inline">{조각.키}</span>
+                  <span className="text-zinc-700 text-[10px] font-mono w-6 shrink-0">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <p className="text-zinc-300 text-sm flex-1 truncate">
+                    {조각.이름}
+                  </p>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="text-zinc-600 text-[10px] font-mono">{조각.장르}</span>
+                    <span className="text-zinc-700 text-[10px] font-mono hidden sm:inline">{조각.BPM}</span>
+                    <span className="text-zinc-700 text-[10px] font-mono hidden sm:inline">{조각.키}</span>
                   </div>
                 </div>
               ))}
@@ -163,7 +155,7 @@ export default function 원석프로필() {
 
             {/* 나머지 조각 수 */}
             {remainingCount > 0 && (
-              <p className="mt-3 text-zinc-700 text-xs tracking-wider">
+              <p className="mt-3 text-zinc-700 text-[10px] tracking-[0.3em]">
                 +{remainingCount}개 더
               </p>
             )}
@@ -171,9 +163,9 @@ export default function 원석프로필() {
             {/* 새 조각 업로드 링크 */}
             <Link
               href="/upload"
-              className="mt-6 bg-teal-600 hover:bg-teal-500 text-white px-6 py-2 rounded-lg text-sm transition-colors"
+              className="mt-6 border border-zinc-800 text-zinc-400 text-xs tracking-[0.3em] px-6 py-3 hover:border-zinc-600 hover:text-zinc-200 transition-all uppercase"
             >
-              새 조각 업로드하기
+              새 조각 올리기
             </Link>
           </div>
         )}
@@ -184,7 +176,7 @@ export default function 원석프로필() {
         {/* 전환 버튼 */}
         <button
           onClick={goNext}
-          className="text-zinc-500 text-xs tracking-wider hover:text-white transition-colors duration-300"
+          className="text-zinc-600 text-[10px] tracking-[0.3em] uppercase hover:text-white transition-colors duration-300 py-3"
         >
           {getButtonLabel()}
         </button>

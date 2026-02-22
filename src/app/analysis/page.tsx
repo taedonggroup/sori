@@ -1,6 +1,6 @@
 "use client";
 
-// 공명 분석 결과 페이지 — ParticleBackground 제거, bg-zinc-950 배경
+// 공명 분석 결과 페이지 - bg-black, monospace 데이터, teal 액센트
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -23,13 +23,6 @@ function safeParseResult(raw: string | null): 조각분석결과 | null {
     return null;
   }
 }
-
-// 페르소나 카드 색상 매핑
-const 페르소나색상 = [
-  { border: "border-purple-800/50", text: "text-purple-300" },
-  { border: "border-blue-800/50", text: "text-blue-300" },
-  { border: "border-white/20", text: "text-white" },
-];
 
 function 분석내용() {
   const searchParams = useSearchParams();
@@ -89,18 +82,18 @@ function 분석내용() {
     return (
       <div className="w-full max-w-lg flex flex-col items-center space-y-12">
         <div className="text-center space-y-2">
-          <p className="text-zinc-500 text-xs tracking-[0.3em] uppercase">
+          <p className="text-zinc-600 text-[10px] tracking-[0.5em] uppercase">
             공명 분석 중
           </p>
-          <p className="text-zinc-400 text-sm truncate">{조각이름}</p>
+          <p className="text-zinc-500 text-sm truncate tracking-wide">{조각이름}</p>
         </div>
 
-        {/* 발광 원형 + 동심원 ripple */}
+        {/* 동심원 ripple */}
         <div className="relative flex items-center justify-center">
           {[0, 1, 2].map((index) => (
             <div
               key={index}
-              className="absolute w-20 h-20 rounded-full border border-teal-500/20 animate-ripple"
+              className="absolute w-20 h-20 rounded-full border border-teal-900/50 animate-ripple"
               style={{ animationDelay: `${index * 0.7}s` }}
             />
           ))}
@@ -108,17 +101,17 @@ function 분석내용() {
             className="w-20 h-20 rounded-full animate-pulse"
             style={{
               background:
-                "radial-gradient(circle, rgba(20,184,166,0.5) 0%, rgba(20,184,166,0) 70%)",
+                "radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%)",
             }}
           />
         </div>
 
         {/* 분석 메시지 + 진행바 */}
         <div className="space-y-4 w-full text-center">
-          <p className="text-zinc-300 text-lg font-light animate-pulse">
+          <p className="text-zinc-400 text-lg font-thin tracking-wide animate-pulse">
             {분석메시지}
           </p>
-          <div className="w-full h-px bg-zinc-900 rounded-full overflow-hidden">
+          <div className="w-full h-px bg-zinc-900 overflow-hidden">
             <div
               className="h-full bg-teal-500/40 transition-all duration-500 ease-out"
               style={{ width: `${진행도}%` }}
@@ -131,41 +124,43 @@ function 분석내용() {
 
   // 결과 화면
   return (
-    <div className="w-full max-w-lg space-y-8 animate-fadeInUp">
+    <div className="w-full max-w-lg space-y-8 animate-fadeInUp pb-28 sm:pb-8">
       {/* 헤더 */}
       <div className="text-center space-y-2">
-        <p className="text-zinc-500 text-xs tracking-[0.3em] uppercase">
+        <p className="text-zinc-600 text-[10px] tracking-[0.5em] uppercase">
           공명 완료
         </p>
-        <h1 className="text-2xl font-light text-white tracking-tight">
+        <h1 className="text-2xl font-thin text-white tracking-widest">
           당신의 조각이 말합니다
         </h1>
       </div>
 
       {/* 분석 카드 */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-5">
+      <div className="bg-black border border-zinc-900 p-6 space-y-5">
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
-            <p className="text-zinc-500 text-xs mb-1">장르</p>
-            <p className="text-white font-medium">{결과?.장르}</p>
+            <p className="text-zinc-600 text-[10px] tracking-widest uppercase mb-2">장르</p>
+            <p className="text-teal-400 font-mono text-sm">{결과?.장르}</p>
           </div>
           <div>
-            <p className="text-zinc-500 text-xs mb-1">BPM</p>
-            <p className="text-white font-medium">{결과?.BPM}</p>
+            <p className="text-zinc-600 text-[10px] tracking-widest uppercase mb-2">BPM</p>
+            <p className="text-white font-mono text-xl">{결과?.BPM}</p>
           </div>
           <div>
-            <p className="text-zinc-500 text-xs mb-1">키</p>
-            <p className="text-white font-medium">{결과?.키}</p>
+            <p className="text-zinc-600 text-[10px] tracking-widest uppercase mb-2">키</p>
+            <p className="text-white font-mono text-xl">{결과?.키}</p>
           </div>
         </div>
 
-        <div className="border-t border-zinc-800 pt-4">
-          <p className="text-zinc-500 text-xs mb-2">감지된 악기</p>
+        <div className="w-full h-px bg-zinc-900" />
+
+        <div>
+          <p className="text-zinc-600 text-[10px] tracking-widest uppercase mb-3">감지된 악기</p>
           <div className="flex flex-wrap gap-2">
             {결과?.악기.map((악기) => (
               <span
                 key={악기}
-                className="px-3 py-1 text-xs border border-zinc-700 text-zinc-300 rounded-full"
+                className="border border-zinc-800 text-zinc-400 text-xs px-3 py-1"
               >
                 {악기}
               </span>
@@ -174,34 +169,30 @@ function 분석내용() {
         </div>
       </div>
 
-      {/* 원석 페르소나 3개 카드 */}
+      {/* 원석 페르소나 */}
       <div className="space-y-3">
-        <p className="text-zinc-500 text-xs text-center tracking-[0.3em] uppercase">
+        <p className="text-zinc-600 text-[10px] text-center tracking-[0.5em] uppercase">
           원석 페르소나
         </p>
-        <div className="grid grid-cols-3 gap-3">
-          {결과?.원석_페르소나.map((키워드, 인덱스) => {
-            const 색상 = 페르소나색상[인덱스] ?? 페르소나색상[2];
-            return (
-              <div
-                key={인덱스}
-                className={`bg-zinc-950 border ${색상.border} rounded-xl p-4 text-center`}
-              >
-                <p className={`${색상.text} font-medium text-sm`}>{키워드}</p>
-              </div>
-            );
-          })}
+        <div className="grid grid-cols-3 gap-px bg-zinc-900">
+          {결과?.원석_페르소나.map((키워드, 인덱스) => (
+            <div
+              key={인덱스}
+              className="bg-black border border-zinc-800 p-4 text-center"
+            >
+              <p className="text-zinc-300 font-medium text-sm">{키워드}</p>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* 울림 버튼 — teal 테두리 */}
+      {/* (첫)울림 버튼 */}
       <Link
         href={`/create?genre=${결과?.장르?.toLowerCase() ?? ""}`}
-        className="block w-full py-4 rounded-full text-sm tracking-wider text-center
-          border border-teal-600 text-white
+        className="block w-full py-4 text-sm tracking-[0.2em] text-center
+          border border-teal-600/60 text-teal-400
           transition-all duration-300
-          hover:border-teal-400 hover:shadow-[0_0_20px_rgba(20,184,166,0.15)]
-          active:scale-[0.98]"
+          hover:border-teal-400"
       >
         (첫)울림을 만들어보세요
       </Link>
@@ -209,7 +200,7 @@ function 분석내용() {
       {/* 다른 조각 분석 링크 */}
       <Link
         href="/upload"
-        className="block text-center text-zinc-600 text-sm hover:text-zinc-400 transition-colors"
+        className="block text-center text-zinc-600 text-[10px] tracking-widest hover:text-zinc-400 transition-colors uppercase"
       >
         다른 조각 분석하기
       </Link>
@@ -219,10 +210,10 @@ function 분석내용() {
 
 export default function 공명분석결과() {
   return (
-    <main className="min-h-screen bg-zinc-950 text-white flex flex-col items-center justify-center px-4 relative overflow-hidden">
+    <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4 relative overflow-hidden">
       <Suspense
         fallback={
-          <p className="text-zinc-500">불러오는 중...</p>
+          <p className="text-zinc-600 text-sm tracking-wide">불러오는 중...</p>
         }
       >
         <분석내용 />

@@ -1,6 +1,6 @@
 "use client";
 
-// 조각 카드 — 재생, 선택 모드, 인플레이스 확장, 닉네임 링크
+// 조각 카드 — 재생, 선택 모드, 인플레이스 확장
 import { useState, useRef } from "react";
 import Link from "next/link";
 import { Play, Pause, Check, X } from "lucide-react";
@@ -31,14 +31,11 @@ export default function JoakakCard({
   const handlePlayToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!audioRef.current) return;
-
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      audioRef.current.play().catch(() => {
-        setIsPlaying(false);
-      });
+      audioRef.current.play().catch(() => setIsPlaying(false));
       setIsPlaying(true);
     }
   };
@@ -74,36 +71,36 @@ export default function JoakakCard({
   return (
     <div
       className={`
-        relative bg-zinc-950 border rounded-2xl p-4 transition-all duration-300
+        relative border transition-all duration-200
         ${selectionMode || (!isExpanded && onToggleExpand) ? "cursor-pointer" : ""}
         ${isSelected
-          ? "border-[#F8F32B] shadow-[0_0_15px_rgba(248,243,43,0.15)]"
+          ? "border-teal-600 bg-teal-950/10"
           : isExpanded
-            ? "border-zinc-600"
-            : "border-zinc-800 hover:border-zinc-600"
+            ? "border-zinc-700 bg-zinc-950/50"
+            : "border-zinc-900 hover:border-zinc-700 bg-black"
         }
       `}
       onClick={!isExpanded ? handleCardClick : undefined}
     >
-      {/* 선택 오버레이 */}
+      {/* 선택 표시 */}
       {selectionMode && isSelected && (
-        <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-[#F8F32B] flex items-center justify-center z-10">
-          <Check size={14} className="text-black" />
+        <div className="absolute top-3 right-3 w-5 h-5 border border-teal-500 bg-teal-500 flex items-center justify-center z-10">
+          <Check size={11} className="text-black" />
         </div>
       )}
 
-      {/* 확장 상태 닫기 버튼 */}
+      {/* 확장 닫기 */}
       {isExpanded && !selectionMode && (
         <button
           onClick={(e) => { e.stopPropagation(); onToggleExpand?.(); }}
-          className="absolute top-3 right-3 w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-zinc-700 transition-colors z-10"
+          className="absolute top-3 right-3 w-6 h-6 flex items-center justify-center text-zinc-600 hover:text-zinc-400 transition-colors z-10"
           aria-label="닫기"
         >
-          <X size={12} className="text-zinc-400" />
+          <X size={12} />
         </button>
       )}
 
-      {/* 오디오 엘리먼트 (숨김) */}
+      {/* 오디오 */}
       <audio
         ref={audioRef}
         src={`/api/gonmyung/joakak/${joakak.id}/audio`}
@@ -113,73 +110,75 @@ export default function JoakakCard({
         preload="none"
       />
 
-      {/* 카드 내용 */}
-      <div className="flex items-start gap-3">
+      {/* 카드 본문 */}
+      <div className="p-4 flex items-start gap-3">
         {/* 재생 버튼 */}
         <button
           onClick={handlePlayToggle}
-          className="shrink-0 w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800
-            flex items-center justify-center hover:border-zinc-600 transition-colors mt-0.5"
+          className={`shrink-0 w-9 h-9 border flex items-center justify-center transition-all mt-0.5 ${
+            isPlaying
+              ? "border-teal-600 text-teal-400"
+              : "border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300"
+          }`}
           aria-label={isPlaying ? "일시정지" : "재생"}
         >
           {isPlaying ? (
-            <Pause size={14} className="text-white" />
+            <Pause size={13} />
           ) : (
-            <Play size={14} className="text-white ml-0.5" />
+            <Play size={13} className="ml-0.5" />
           )}
         </button>
 
         {/* 파일 정보 */}
         <div className="flex-1 min-w-0 space-y-1.5">
-          <p className="text-white text-sm font-medium truncate pr-8">
+          <p className="text-white text-sm font-light truncate pr-6 leading-tight">
             {joakak.original_filename}
           </p>
 
-          {/* 닉네임 링크 */}
+          {/* 닉네임 */}
           <Link
             href={`/profile/${encodeURIComponent(joakak.nickname)}`}
             onClick={(e) => e.stopPropagation()}
-            className="text-xs hover:underline transition-colors"
-            style={{ color: "#F8F32B" }}
+            className="text-[10px] text-teal-600 hover:text-teal-400 tracking-[0.15em] transition-colors"
           >
             @{joakak.nickname}
           </Link>
 
-          {/* 메타데이터 태그 */}
-          <div className="flex flex-wrap gap-1.5 mt-2">
+          {/* 음악 메타데이터 — 전문 포맷 */}
+          <div className="flex flex-wrap items-center gap-2 mt-1.5">
             {joakak.genre && (
-              <span className="text-zinc-400 text-[10px] bg-zinc-900 border border-zinc-800 rounded-full px-2 py-0.5">
+              <span className="text-teal-700 text-[10px] font-mono tracking-wide">
                 {joakak.genre}
               </span>
             )}
             {joakak.bpm && (
-              <span className="text-zinc-500 text-[10px] bg-zinc-900 border border-zinc-800 rounded-full px-2 py-0.5">
+              <span className="text-zinc-600 text-[10px] font-mono">
                 {joakak.bpm} BPM
               </span>
             )}
             {joakak.key_signature && (
-              <span className="text-zinc-500 text-[10px] bg-zinc-900 border border-zinc-800 rounded-full px-2 py-0.5">
+              <span className="text-zinc-600 text-[10px] font-mono">
                 {joakak.key_signature}
               </span>
             )}
           </div>
 
-          {/* 하단 정보 */}
+          {/* 하단 통계 */}
           <div className="flex items-center justify-between mt-1">
-            <span className="text-zinc-700 text-[10px]">
-              재생 {joakak.play_count}회
+            <span className="text-zinc-800 text-[10px] font-mono">
+              {joakak.play_count}회
             </span>
-            <span className="text-zinc-700 text-[10px]">
+            <span className="text-zinc-800 text-[10px] font-mono">
               {formatFileSize(joakak.file_size)}
             </span>
           </div>
         </div>
       </div>
 
-      {/* 확장 영역: 프로그레스바 */}
+      {/* 확장 영역: 시크바 */}
       <div
         className={`overflow-hidden transition-all duration-300 ease-in-out ${
-          isExpanded ? "max-h-16 mt-3" : "max-h-0"
+          isExpanded ? "max-h-16 pb-4 px-4" : "max-h-0"
         }`}
       >
         <input
@@ -189,30 +188,26 @@ export default function JoakakCard({
           value={currentTime}
           onChange={handleSeek}
           onClick={(e) => e.stopPropagation()}
-          className="w-full h-1 appearance-none rounded-full cursor-pointer
-            [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3
-            [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full
-            [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:cursor-pointer"
+          className="w-full h-px appearance-none cursor-pointer"
           style={{
             background: duration
-              ? `linear-gradient(to right, #ffffff ${(currentTime / duration) * 100}%, #3f3f46 ${(currentTime / duration) * 100}%)`
-              : "#3f3f46",
+              ? `linear-gradient(to right, #14b8a6 ${(currentTime / duration) * 100}%, #27272a ${(currentTime / duration) * 100}%)`
+              : "#27272a",
+            outline: "none",
+            border: "none",
           }}
         />
-        <div className="flex justify-between mt-1.5">
-          <span className="text-zinc-600 text-[10px]">{formatTime(currentTime)}</span>
-          <span className="text-zinc-600 text-[10px]">{formatTime(duration)}</span>
+        <div className="flex justify-between mt-2">
+          <span className="text-zinc-700 text-[10px] font-mono">{formatTime(currentTime)}</span>
+          <span className="text-zinc-700 text-[10px] font-mono">{formatTime(duration)}</span>
         </div>
       </div>
 
-      {/* 페르소나 태그 (있을 경우) */}
+      {/* 페르소나 태그 */}
       {joakak.persona.length > 0 && (
-        <div className="flex flex-wrap gap-1 mt-3 pt-3 border-t border-zinc-900">
+        <div className="flex flex-wrap gap-1 px-4 pb-3 pt-0 border-t border-zinc-900">
           {joakak.persona.slice(0, 3).map((tag) => (
-            <span
-              key={tag}
-              className="text-zinc-500 text-[10px] tracking-wider"
-            >
+            <span key={tag} className="text-zinc-700 text-[10px] tracking-[0.15em] font-mono">
               #{tag}
             </span>
           ))}
