@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import TransitionOverlay from "@/components/TransitionOverlay";
-import CanvasLoader from "@/components/3d/CanvasLoader";
+import Navbar from "@/components/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,18 +26,16 @@ export default function RootLayout({
   return (
     <html lang="ko" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{ backgroundColor: "#09090b", color: "#fafafa" }}
       >
-        {/* 3D 배경 캔버스 — fixed, z-0, 항상 마운트 유지 (SSR 비활성화) */}
-        <CanvasLoader />
+        {/* 글로벌 네비게이션 */}
+        <Navbar />
 
-        {/* 씬 전환 fade-to-black 오버레이 — z-5 */}
-        <TransitionOverlay />
-
-        {/* HTML UI 오버레이 — z-10 */}
-        <main className="relative" style={{ zIndex: 10 }}>
+        {/* 페이지 컨텐츠 — Navbar 높이(56px) 만큼 상단 여백 */}
+        <div className="pt-14">
           {children}
-        </main>
+        </div>
       </body>
     </html>
   );

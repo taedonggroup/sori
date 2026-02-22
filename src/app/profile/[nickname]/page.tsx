@@ -1,8 +1,5 @@
 // 원석 프로필 동적 라우트 — 서버사이드 렌더링 (SEO)
-// 3D 배경은 SoriCanvas(layout)에서 담당 — profile 씬 강한 발광
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import SceneEffect from "@/components/SceneEffect";
 import ProfileCard from "@/components/gonmyung/ProfileCard";
 import type { ProfileResponse } from "@/lib/gonmyung/types";
 
@@ -31,23 +28,20 @@ export default async function 원석프로필페이지({ params }: ProfilePagePr
   const profile = await getProfile(decodedNickname);
 
   return (
-    <main className="min-h-screen bg-transparent text-white overflow-x-hidden relative">
-      {/* profile 씬으로 전환 — 원석 대형화 + 강한 내부 발광 */}
-      <SceneEffect scene="profile" />
-
-      {/* 상단 브랜드 */}
-      <header className="fixed top-0 left-0 z-20 p-6 md:p-8">
-        <Link href="/">
-          <span className="text-zinc-600 text-xs tracking-[0.3em] uppercase font-light hover:text-zinc-400 transition-colors">
-            SORI
-          </span>
+    <main className="min-h-screen bg-zinc-950 text-white">
+      {/* 상단 심플 뒤로가기 */}
+      <header className="px-6 py-4 border-b border-zinc-900">
+        <Link
+          href="/"
+          className="text-zinc-500 text-sm hover:text-zinc-300 flex items-center gap-1 transition-colors"
+        >
+          ← SORI
         </Link>
       </header>
 
-      {/* 메인 컨텐츠 */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-24">
+      <div className="max-w-2xl mx-auto px-6 py-12">
         {profile ? (
-          <div className="w-full max-w-lg space-y-10 animate-fadeInUp">
+          <div className="space-y-8">
             <ProfileCard profile={profile} />
 
             {/* 조각 목록 (최대 5개) */}
@@ -61,9 +55,8 @@ export default async function 원석프로필페이지({ params }: ProfilePagePr
                     <div
                       key={joakak.id}
                       className="group flex items-center justify-between p-3 rounded-lg
-                        border border-zinc-900 bg-black/60 backdrop-blur-sm
-                        hover:border-zinc-700 hover:bg-zinc-900/80 transition-all duration-300"
-                      style={{ animationDelay: `${i * 60}ms` }}
+                        border border-zinc-800 bg-zinc-900
+                        hover:border-zinc-700 hover:bg-zinc-800 transition-all duration-300"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <span className="text-zinc-700 text-xs font-mono w-5 shrink-0">
@@ -75,12 +68,18 @@ export default async function 원석프로필페이지({ params }: ProfilePagePr
                       </div>
                       <div className="flex items-center gap-2 shrink-0 ml-4">
                         {joakak.genre && (
-                          <span className="text-zinc-500 text-xs">{joakak.genre}</span>
+                          <span className="text-zinc-500 text-xs">
+                            {joakak.genre}
+                          </span>
                         )}
                         {joakak.bpm && (
                           <>
-                            <span className="text-zinc-800 text-xs hidden sm:inline">·</span>
-                            <span className="text-zinc-500 text-xs hidden sm:inline">{joakak.bpm}</span>
+                            <span className="text-zinc-800 text-xs hidden sm:inline">
+                              ·
+                            </span>
+                            <span className="text-zinc-500 text-xs hidden sm:inline">
+                              {joakak.bpm}
+                            </span>
                           </>
                         )}
                       </div>
@@ -95,24 +94,26 @@ export default async function 원석프로필페이지({ params }: ProfilePagePr
               </div>
             )}
 
-            {/* 액션 버튼 */}
+            {/* 새 조각 올리기 버튼 */}
             <div className="flex justify-center">
-              <Button
-                variant="sori-outline"
-                className="px-6 rounded-full text-xs tracking-wider"
-                asChild
+              <Link
+                href="/upload"
+                className="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2 rounded-lg text-sm transition-colors"
               >
-                <Link href="/upload">새 조각 올리기</Link>
-              </Button>
+                새 조각 올리기
+              </Link>
             </div>
           </div>
         ) : (
-          <div className="text-center space-y-4 animate-fadeInUp">
+          <div className="text-center space-y-4 py-24">
             <p className="text-zinc-500 text-sm">원석을 찾을 수 없습니다</p>
             <p className="text-zinc-700 text-xs">@{decodedNickname}</p>
-            <Button variant="sori-ghost" asChild>
-              <Link href="/gallery">갤러리로 돌아가기</Link>
-            </Button>
+            <Link
+              href="/gallery"
+              className="text-zinc-400 hover:text-zinc-200 px-4 py-2 rounded-lg text-sm transition-colors inline-block"
+            >
+              갤러리로 돌아가기
+            </Link>
           </div>
         )}
       </div>

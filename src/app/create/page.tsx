@@ -3,7 +3,6 @@
 // (첫)울림 만들기 — 갤러리에서 조각 선택 → FFmpeg amix 믹스
 import { useState, useCallback } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import JoakakFeed from "@/components/gonmyung/JoakakFeed";
 import MixSelector from "@/components/gonmyung/MixSelector";
 import ResonanceLoader from "@/components/gonmyung/ResonanceLoader";
@@ -62,7 +61,7 @@ export default function CreatePage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen bg-zinc-950 text-white">
       {/* 공명 로딩 오버레이 */}
       <ResonanceLoader
         isLoading={isMixing}
@@ -73,10 +72,11 @@ export default function CreatePage() {
       <div className="max-w-3xl mx-auto px-6 py-16 pb-32">
         {/* 헤더 */}
         <header className="text-center mb-10 space-y-3">
-          <Link href="/">
-            <h2 className="text-zinc-600 text-xs tracking-[0.4em] uppercase hover:text-zinc-400 transition-colors">
-              ← 공간으로
-            </h2>
+          <Link
+            href="/"
+            className="text-zinc-500 text-sm hover:text-zinc-300 transition-colors"
+          >
+            ← 공간으로
           </Link>
           <h1 className="text-2xl font-light text-white tracking-tight">
             (첫)울림 만들기
@@ -97,20 +97,23 @@ export default function CreatePage() {
           /* 결과 */
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <p className="text-zinc-500 text-xs tracking-[0.3em] uppercase">공명 완료</p>
+              <p className="text-zinc-500 text-xs tracking-[0.3em] uppercase">
+                공명 완료
+              </p>
               <p className="text-zinc-400 text-sm">
                 {mixResult.joakakCount}개의 조각이 하나의 울림이 되었습니다
               </p>
             </div>
 
             {/* 울림 플레이어 */}
-            <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 space-y-4">
-              <p className="text-zinc-500 text-xs tracking-[0.3em] uppercase text-center">울림</p>
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4">
+              <p className="text-zinc-500 text-xs tracking-[0.3em] uppercase text-center">
+                울림
+              </p>
               <audio
                 controls
                 src={mixResult.outputUrl}
                 className="w-full"
-                style={{ filter: "invert(1) hue-rotate(180deg)" }}
               />
               <p className="text-zinc-700 text-xs text-center">
                 재생 시간: {Math.round(mixResult.duration)}초
@@ -118,12 +121,18 @@ export default function CreatePage() {
             </div>
 
             <div className="flex justify-center gap-3">
-              <Button variant="sori-ghost" onClick={handleReset}>
+              <button
+                onClick={handleReset}
+                className="text-zinc-400 hover:text-zinc-200 px-4 py-2 rounded-lg transition-colors"
+              >
                 다시 선택하기
-              </Button>
-              <Button variant="sori-outline" asChild>
-                <Link href="/gallery">갤러리로</Link>
-              </Button>
+              </button>
+              <Link
+                href="/gallery"
+                className="border border-zinc-700 hover:border-zinc-500 text-zinc-300 px-4 py-2 rounded-lg transition-colors"
+              >
+                갤러리로
+              </Link>
             </div>
           </div>
         ) : (
@@ -144,9 +153,12 @@ export default function CreatePage() {
 
         {!mixResult && (
           <div className="mt-8 text-center">
-            <Button variant="sori-ghost" className="text-sm" asChild>
-              <Link href="/gallery">갤러리로 돌아가기</Link>
-            </Button>
+            <Link
+              href="/gallery"
+              className="text-zinc-400 hover:text-zinc-200 px-4 py-2 rounded-lg text-sm transition-colors"
+            >
+              갤러리로 돌아가기
+            </Link>
           </div>
         )}
       </div>

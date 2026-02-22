@@ -83,38 +83,38 @@
 }
 
 .dark {
-  /* SORI 테마 — 순수 검정 + #F8F32B 액센트 */
-  --background: oklch(0 0 0);              /* #000000 순수 검정 */
-  --foreground: oklch(0.985 0 0);          /* 흰색 텍스트 */
-  --card: oklch(0.07 0 0);                 /* zinc-950 #09090b */
+  /* SORI 테마 — zinc-950 배경 + teal 액센트 */
+  --background: oklch(0.07 0 0);          /* #09090b zinc-950 */
+  --foreground: oklch(0.985 0 0);         /* 흰색 텍스트 */
+  --card: oklch(0.11 0 0);               /* zinc-900 */
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.07 0 0);
+  --popover: oklch(0.11 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.93 0.16 103);         /* #F8F32B SORI 옐로 */
-  --primary-foreground: oklch(0 0 0);      /* 검정 (옐로 위 텍스트) */
-  --secondary: oklch(0.15 0 0);            /* zinc-900 */
+  --primary: oklch(0.6 0.15 195);        /* teal-500 #14b8a6 */
+  --primary-foreground: oklch(0 0 0);
+  --secondary: oklch(0.15 0 0);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.21 0 0);               /* zinc-800 */
-  --muted-foreground: oklch(0.55 0 0);     /* zinc-500 */
+  --muted: oklch(0.21 0 0);
+  --muted-foreground: oklch(0.55 0 0);
   --accent: oklch(0.15 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(0.27 0 0);              /* zinc-800 #27272a */
+  --border: oklch(0.27 0 0);             /* zinc-800 */
   --input: oklch(0.27 0 0);
-  --ring: oklch(0.93 0.16 103);            /* #F8F32B 포커스 링 */
-  --chart-1: oklch(0.93 0.16 103);
+  --ring: oklch(0.6 0.15 195);           /* teal 포커스 링 */
+  --chart-1: oklch(0.6 0.15 195);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
   --sidebar: oklch(0.07 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.93 0.16 103);
+  --sidebar-primary: oklch(0.6 0.15 195);
   --sidebar-primary-foreground: oklch(0 0 0);
   --sidebar-accent: oklch(0.15 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.27 0 0);
-  --sidebar-ring: oklch(0.93 0.16 103);
+  --sidebar-ring: oklch(0.6 0.15 195);
 }
 
 @layer base {
@@ -122,8 +122,8 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-black text-white;
-    background-color: #000000;
+    background-color: #09090b;
+    color: #fafafa;
   }
 }
 
@@ -149,8 +149,8 @@
 }
 
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 10px rgba(255,255,255,0.1); }
-  50% { box-shadow: 0 0 30px rgba(255,255,255,0.3); }
+  0%, 100% { box-shadow: 0 0 10px rgba(20, 184, 166, 0.1); }
+  50% { box-shadow: 0 0 30px rgba(20, 184, 166, 0.3); }
 }
 
 .animate-soundwave { animation: soundwave 1s ease-in-out infinite; }
@@ -189,17 +189,17 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #F8F32B;
+  background: #14b8a6;
   cursor: pointer;
-  box-shadow: 0 0 6px rgba(248, 243, 43, 0.4);
+  box-shadow: 0 0 6px rgba(20, 184, 166, 0.4);
 }
 
 .gonmyung-slider::-moz-range-thumb {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #F8F32B;
+  background: #14b8a6;
   cursor: pointer;
   border: none;
-  box-shadow: 0 0 6px rgba(248, 243, 43, 0.4);
+  box-shadow: 0 0 6px rgba(20, 184, 166, 0.4);
 }

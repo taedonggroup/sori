@@ -1,11 +1,8 @@
 "use client";
 
 // 조각 갤러리 — 커뮤니티 조각 피드 + 선택→공명 믹스
-// 3D 배경은 SoriCanvas(layout)에서 담당
 import { useState, useCallback } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import SceneEffect from "@/components/SceneEffect";
 import JoakakFeed from "@/components/gonmyung/JoakakFeed";
 import MixSelector from "@/components/gonmyung/MixSelector";
 import ResonanceLoader from "@/components/gonmyung/ResonanceLoader";
@@ -59,10 +56,7 @@ export default function 갤러리() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-transparent text-white">
-      {/* gallery 씬으로 전환 — 원석 소형화 우측 배치 */}
-      <SceneEffect scene="gallery" />
-
+    <main className="min-h-screen bg-zinc-950 text-white">
       {/* 공명 로딩 오버레이 */}
       <ResonanceLoader
         isLoading={isMixing}
@@ -70,42 +64,47 @@ export default function 갤러리() {
         currentStep="조각들을 공명으로 믹싱하는 중..."
       />
 
-      <div className="max-w-3xl mx-auto px-4 py-12 pb-32">
+      <div className="max-w-3xl mx-auto px-4 py-8 pb-32">
         {/* 헤더 */}
-        <header className="flex items-center justify-between mb-10">
-          <div className="space-y-1">
-            <Link href="/">
-              <span className="text-zinc-600 text-xs tracking-[0.4em] uppercase hover:text-zinc-400 transition-colors">
-                ← 공간으로
-              </span>
+        <header className="flex items-center justify-between mb-8">
+          <div>
+            <Link
+              href="/"
+              className="text-zinc-500 text-sm hover:text-zinc-300 flex items-center gap-1 mb-2 transition-colors"
+            >
+              ← 공간으로
             </Link>
-            <h1 className="text-2xl font-light text-white tracking-tight">
-              조각 갤러리
-            </h1>
+            <h1 className="text-2xl font-semibold text-white">조각 갤러리</h1>
           </div>
-          <Button variant="sori-outline" size="sori-lg" className="text-sm" asChild>
-            <Link href="/upload">조각 올리기</Link>
-          </Button>
+          <Link
+            href="/upload"
+            className="bg-teal-600 hover:bg-teal-500 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+          >
+            조각 올리기
+          </Link>
         </header>
 
         {/* 믹스 결과 */}
         {mixResult ? (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <p className="text-zinc-500 text-xs tracking-[0.3em] uppercase">공명 완료</p>
+              <p className="text-zinc-500 text-xs tracking-[0.3em] uppercase">
+                공명 완료
+              </p>
               <h2 className="text-xl font-light text-white">
                 {mixResult.joakakCount}개의 조각이 하나의 울림이 되었습니다
               </h2>
             </div>
 
             {/* 울림 플레이어 */}
-            <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 space-y-4">
-              <p className="text-zinc-500 text-xs tracking-[0.3em] uppercase text-center">울림</p>
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4">
+              <p className="text-zinc-500 text-xs tracking-[0.3em] uppercase text-center">
+                울림
+              </p>
               <audio
                 controls
                 src={mixResult.outputUrl}
                 className="w-full"
-                style={{ filter: "invert(1) hue-rotate(180deg)" }}
               />
               <p className="text-zinc-700 text-xs text-center">
                 재생 시간: {Math.round(mixResult.duration)}초
@@ -113,12 +112,18 @@ export default function 갤러리() {
             </div>
 
             <div className="flex justify-center gap-3">
-              <Button variant="sori-ghost" onClick={handleReset}>
+              <button
+                onClick={handleReset}
+                className="text-zinc-400 hover:text-zinc-200 px-4 py-2 rounded-lg transition-colors"
+              >
                 다시 선택하기
-              </Button>
-              <Button variant="sori-outline" asChild>
-                <Link href="/">공간으로</Link>
-              </Button>
+              </button>
+              <Link
+                href="/"
+                className="border border-zinc-700 hover:border-zinc-500 text-zinc-300 px-4 py-2 rounded-lg transition-colors"
+              >
+                공간으로
+              </Link>
             </div>
           </div>
         ) : (

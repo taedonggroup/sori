@@ -1,12 +1,11 @@
 "use client";
 
 // 조각 업로드 페이지 — Supabase 직접 업로드 → Gemini 분석 인라인 표시 → 갤러리 저장
-// 3D 배경은 SoriCanvas(layout)에서 담당 + UploadOrb 발광 구체 표시
+// SceneEffect 제거, 독립적 bg-zinc-950 배경
 import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import SceneEffect from "@/components/SceneEffect";
+import Link from "next/link";
 import NicknameInput from "@/components/gonmyung/NicknameInput";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { validateAudioFile } from "@/lib/gonmyung/validation";
@@ -160,7 +159,6 @@ export default function 조각업로드() {
       const response = await fetch(samplePath);
       const blob = await response.blob();
       const file = new File([blob], `${sampleTitle}.mp3`, { type: "audio/mpeg" });
-      // 샘플도 파일 크기 검증 (validation과 동일한 기준)
       const validationError = validateAudioFile(file);
       if (validationError) {
         에러메시지설정(validationError);
@@ -215,11 +213,18 @@ export default function 조각업로드() {
   const 로딩중 = 분석중 || 업로드중;
 
   return (
-    <main className="min-h-screen bg-transparent text-white flex flex-col items-center justify-center px-4 py-16 relative overflow-hidden">
-      {/* upload 씬으로 전환 — UploadOrb 발광 구체 활성화 */}
-      <SceneEffect scene="upload" />
+    <main className="min-h-screen bg-zinc-950 text-white flex flex-col items-center justify-center px-4 py-16 relative overflow-hidden">
+      <div className="w-full max-w-lg flex flex-col items-center space-y-8">
+        {/* 뒤로가기 */}
+        <div className="w-full">
+          <Link
+            href="/"
+            className="text-zinc-500 text-sm hover:text-zinc-300 transition-colors inline-flex items-center gap-1"
+          >
+            ← 공간으로
+          </Link>
+        </div>
 
-      <div className="relative z-10 w-full max-w-lg flex flex-col items-center space-y-8">
         {/* 헤더 */}
         <div className="text-center space-y-3">
           <p className="text-zinc-500 text-xs tracking-[0.3em] uppercase">조각 업로드</p>
@@ -238,8 +243,8 @@ export default function 조각업로드() {
             w-56 h-56 rounded-full border-2 border-dashed
             flex flex-col items-center justify-center
             cursor-pointer transition-all duration-500
-            ${드래그중 ? "border-white shadow-[0_0_30px_rgba(255,255,255,0.2)]"
-              : 선택된조각 ? "border-white" : "border-zinc-700 hover:border-zinc-500"}
+            ${드래그중 ? "border-teal-400 shadow-[0_0_30px_rgba(20,184,166,0.2)]"
+              : 선택된조각 ? "border-teal-600/50" : "border-zinc-700 hover:border-zinc-500"}
           `}
           onDragOver={드래그오버처리}
           onDragLeave={드래그나감처리}
@@ -251,7 +256,7 @@ export default function 조각업로드() {
             <div className="flex flex-col items-center space-y-3">
               <div className="flex items-end gap-1 h-8">
                 {[0,1,2,3,4].map((i) => (
-                  <div key={i} className="w-1 bg-white rounded-full animate-soundwave" style={{ animationDelay: `${i * 0.15}s` }} />
+                  <div key={i} className="w-1 bg-teal-400 rounded-full animate-soundwave" style={{ animationDelay: `${i * 0.15}s` }} />
                 ))}
               </div>
               <div className="text-center px-6">
@@ -290,22 +295,31 @@ export default function 조각업로드() {
         {/* 버튼 영역 */}
         <div className="flex flex-col items-center gap-3 w-full">
           {!분석결과 && (
-            <Button variant="sori-outline" size="sori-lg" className="max-w-xs"
-              disabled={!선택된조각 || 로딩중} onClick={() => 공명에게들려주기()}>
+            <button
+              className="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed max-w-xs w-full"
+              disabled={!선택된조각 || 로딩중}
+              onClick={() => 공명에게들려주기()}
+            >
               {분석중 ? "공명이 듣는 중..." : "공명에게 들려주기"}
-            </Button>
+            </button>
           )}
           {분석결과 && (
             <>
-              <Button variant="sori-primary" size="sori-lg" className="max-w-xs"
-                disabled={!닉네임유효 || 로딩중} onClick={갤러리에올리기}>
+              <button
+                className="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed max-w-xs w-full"
+                disabled={!닉네임유효 || 로딩중}
+                onClick={갤러리에올리기}
+              >
                 {업로드중 ? "올리는 중..." : "갤러리에 올리기"}
-              </Button>
+              </button>
               {!닉네임유효 && <p className="text-zinc-600 text-xs">닉네임을 먼저 입력해주세요</p>}
-              <Button variant="sori-ghost" size="sori-lg" className="max-w-xs text-sm"
-                onClick={() => 공명에게들려주기()} disabled={로딩중}>
+              <button
+                className="border border-zinc-700 hover:border-zinc-500 text-zinc-300 px-4 py-2 rounded-lg text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed max-w-xs w-full"
+                onClick={() => 공명에게들려주기()}
+                disabled={로딩중}
+              >
                 다시 분석하기
-              </Button>
+              </button>
             </>
           )}
         </div>

@@ -19,13 +19,13 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
-        // SORI 커스텀 variants
+        // SORI 커스텀 variants — teal 액센트
         "sori-primary":
-          "border border-[#F8F32B]/60 text-[#F8F32B] bg-transparent hover:border-[#F8F32B] hover:shadow-[0_0_20px_rgba(248,243,43,0.15)] active:scale-[0.98]",
+          "bg-teal-600 text-white hover:bg-teal-500 active:scale-[0.98] shadow-sm",
         "sori-outline":
-          "border border-white/60 text-white bg-transparent hover:border-white hover:shadow-[0_0_20px_rgba(255,255,255,0.15)] active:scale-[0.98]",
+          "border border-zinc-700 text-zinc-200 bg-transparent hover:border-teal-600 hover:text-teal-400 active:scale-[0.98]",
         "sori-ghost":
-          "text-zinc-500 bg-transparent hover:text-white",
+          "text-zinc-500 bg-transparent hover:text-zinc-200 hover:bg-zinc-900",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
