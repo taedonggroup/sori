@@ -18,6 +18,7 @@ export default function 갤러리() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isMixing, setIsMixing] = useState(false);
   const [mixResult, setMixResult] = useState<MixResult | null>(null);
+  const [mixError, setMixError] = useState<string | null>(null);
 
   const handleSelectToggle = useCallback((joakak: Joakak) => {
     setSelectedIds((prev) =>
@@ -30,21 +31,22 @@ export default function 갤러리() {
   const handleMix = useCallback(async () => {
     if (selectedIds.length < 2) return;
     setIsMixing(true);
+    setMixError(null);
     try {
       const response = await fetch("/api/gonmyung/mix", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ joakak_ids: selectedIds }),
       });
-      if (!response.ok) throw new Error("믹스 실패");
+      if (!response.ok) throw new Error(`믹스 실패 (${response.status})`);
       const data = (await response.json()) as MixResponse;
       setMixResult({
         outputUrl: data.output_url,
         joakakCount: data.joakak_count,
         duration: data.duration,
       });
-    } catch {
-      // 오류 무시
+    } catch (error) {
+      setMixError(error instanceof Error ? error.message : "공명 믹스에 실패했습니다.");
     } finally {
       setIsMixing(false);
     }
@@ -53,6 +55,7 @@ export default function 갤러리() {
   const handleReset = useCallback(() => {
     setMixResult(null);
     setSelectedIds([]);
+    setMixError(null);
   }, []);
 
   return (
@@ -81,6 +84,13 @@ export default function 갤러리() {
       </header>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 pb-28 sm:pb-8">
+        {/* 믹스 오류 */}
+        {mixError && (
+          <div className="mb-6 p-4 bg-black border border-red-900 text-center">
+            <p className="text-red-400 text-sm">{mixError}</p>
+          </div>
+        )}
+
         {/* 믹스 결과 */}
         {mixResult ? (
           <div className="space-y-6">

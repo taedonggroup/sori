@@ -98,7 +98,7 @@ export default function JoakakFeed({
             key={tab.value}
             onClick={() => setActiveGenre(tab.value)}
             className={`
-              shrink-0 px-4 py-1.5 rounded-full text-xs tracking-wider transition-all duration-200
+              shrink-0 px-4 py-1.5 text-xs tracking-wider transition-all duration-200
               ${activeGenre === tab.value
                 ? "bg-white text-black"
                 : "bg-zinc-950 border border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
@@ -142,7 +142,7 @@ export default function JoakakFeed({
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="bg-zinc-950 border border-zinc-900 rounded-2xl p-4 h-32 animate-pulse"
+              className="bg-zinc-950 border border-zinc-900 p-4 h-32 animate-pulse"
             />
           ))}
         </div>

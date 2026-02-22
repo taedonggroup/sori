@@ -2,6 +2,8 @@
 
 // (첫)울림 만들기 — 갤러리에서 조각 선택 → FFmpeg amix 믹스
 import { useState, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import Link from "next/link";
 import JoakakFeed from "@/components/gonmyung/JoakakFeed";
 import MixSelector from "@/components/gonmyung/MixSelector";
@@ -14,7 +16,11 @@ interface MixResult {
   duration: number;
 }
 
-export default function CreatePage() {
+// 내부 컴포넌트 — useSearchParams 사용 (Suspense 필요)
+function CreateContent() {
+  const searchParams = useSearchParams();
+  const genreParam = searchParams.get("genre") ?? "";
+
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isMixing, setIsMixing] = useState(false);
   const [mixResult, setMixResult] = useState<MixResult | null>(null);
@@ -74,7 +80,11 @@ export default function CreatePage() {
         <div className="max-w-3xl mx-auto">
           <p className="text-zinc-600 text-[10px] tracking-[0.5em] uppercase mb-1">SORI / 공명</p>
           <h1 className="text-white text-lg font-light tracking-widest">(첫)울림 만들기</h1>
-          <p className="text-zinc-600 text-xs tracking-[0.2em] mt-1">조각을 2개 이상 선택하면 공명이 믹스합니다</p>
+          <p className="text-zinc-600 text-xs tracking-[0.2em] mt-1">
+            {genreParam
+              ? `${genreParam.toUpperCase()} 장르 조각을 2개 이상 선택하면 공명이 믹스합니다`
+              : "조각을 2개 이상 선택하면 공명이 믹스합니다"}
+          </p>
         </div>
       </header>
 
@@ -137,6 +147,7 @@ export default function CreatePage() {
                 : `${selectedIds.length}개 선택됨 — 2개 이상이면 믹스 패널이 나타납니다`}
             </p>
             <JoakakFeed
+              genreFilter={genreParam}
               selectionMode
               selectedIds={selectedIds}
               onSelectToggle={handleSelectToggle}
@@ -165,5 +176,13 @@ export default function CreatePage() {
         />
       )}
     </main>
+  );
+}
+
+export default function CreatePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+      <CreateContent />
+    </Suspense>
   );
 }
