@@ -1,9 +1,8 @@
 "use client"
 
-// 원석 B — 균열 원석 (각성 중 상태)
-// 레퍼런스: IMG_9790.PNG — 금빛 균열 맥 + 청록/보라 이리데슨트 발광
-// GLB: /models/stone-b.glb (원석 A와 동일 형태, 다른 머티리얼)
-// 시각 효과: Voronoi GLSL 셰이더로 금빛 균열 + Fresnel 이리데슨트
+// 원석 B — 금빛 균열 + 청보라 이리데슨트 (각성 중)
+// GLB: stone-b.glb (Blender 베이크: Voronoi 금맥 albedo + 발광 emit 텍스처 내장)
+// 시각 효과: GLB 텍스처 기반 + Fresnel 이리데슨트 셰이더 오버레이
 import { useRef, useMemo } from "react"
 import { useFrame } from "@react-three/fiber"
 import { useGLTF } from "@react-three/drei"
@@ -11,144 +10,95 @@ import * as THREE from "three"
 import { useSceneStore, type SceneName } from "@/store/sceneStore"
 
 const EMISSIVE_BY_SCENE: Record<SceneName, number> = {
-  stone:     0.35,
-  fragments: 1.0,
-  upload:    0.55,
-  gallery:   0.48,
-  profile:   1.2,
+  stone: 1.2, fragments: 3.5, upload: 2.0, gallery: 1.8, profile: 4.5,
 }
 
-// ─── Vertex Shader ────────────────────────────────────────────
+// 이리데슨트 Fresnel 셰이더 — GLB 텍스처 위에 오버레이
 const vertexShader = /* glsl */ `
   varying vec3 vNormal;
+  varying vec2 vUv;
   varying vec3 vWorldPos;
 
   void main() {
-    vNormal = normalize(normalMatrix * normal);
-    vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-    vWorldPos = worldPosition.xyz;
-    gl_Position = projectionMatrix * viewMatrix * worldPosition;
+    vNormal   = normalize(normalMatrix * normal);
+    vUv       = uv;
+    vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
   }
 `
 
-// ─── Fragment Shader ──────────────────────────────────────────
-// Voronoi 엣지 거리 → 금빛 균열 맥
-// Fresnel 각도   → 청록/보라 이리데슨트
-// 높이 기반      → 상단=어두운 회색, 하단=청보라 내부 발광
 const fragmentShader = /* glsl */ `
   varying vec3 vNormal;
+  varying vec2 vUv;
   varying vec3 vWorldPos;
 
-  uniform float uTime;
-  uniform float uEmissive;
+  uniform sampler2D uAlbedo;
+  uniform sampler2D uEmit;
+  uniform float     uEmissive;
+  uniform float     uTime;
 
-  vec2 hash22(vec2 p) {
-    p = fract(p * vec2(443.897, 441.423));
-    p += dot(p, p + 19.19);
-    return fract(vec2(p.x * p.y, p.x + p.y));
-  }
-
-  // Voronoi 엣지 거리 (균열 맥 패턴)
-  float voronoiEdge(vec2 p) {
-    vec2 ip = floor(p);
-    vec2 fp = fract(p);
-    float d1 = 10.0, d2 = 10.0;
-
-    for (int x = -1; x <= 1; x++) {
-      for (int y = -1; y <= 1; y++) {
-        vec2 n    = vec2(float(x), float(y));
-        vec2 cell = hash22(ip + n);
-        // 시간에 따라 균열이 매우 천천히 움직임
-        cell = 0.5 + 0.45 * sin(uTime * 0.12 + 6.28318 * cell);
-        vec2 diff = n + cell - fp;
-        float d = length(diff);
-        if (d < d1) { d2 = d1; d1 = d; }
-        else if (d < d2) { d2 = d; }
-      }
-    }
-    return d2 - d1;
+  // 미세 Fresnel 이리데슨트 (시야각 기반)
+  vec3 fresnel_irid(vec3 norm) {
+    float f = pow(1.0 - abs(dot(norm, vec3(0.0, 0.0, 1.0))), 3.5);
+    vec3 teal   = vec3(0.0, 0.80, 0.85);
+    vec3 purple = vec3(0.55, 0.0, 0.92);
+    return mix(teal, purple, sin(f * 6.28 + uTime * 0.4) * 0.5 + 0.5) * f * 0.55;
   }
 
   void main() {
-    // 두 방향 Voronoi 겹침 → 불규칙 균열 패턴
-    vec2 uv1 = vWorldPos.xz * 1.9;
-    vec2 uv2 = vWorldPos.xy * 1.4 + vec2(0.31, 0.73);
-    float vein     = min(voronoiEdge(uv1), voronoiEdge(uv2));
-    float veinMask = 1.0 - smoothstep(0.0, 0.085, vein);
+    vec4 alb  = texture2D(uAlbedo, vUv);
+    vec4 emit = texture2D(uEmit,   vUv);
 
-    // Fresnel: 시야각에 따라 색상 변환
-    float fresnel = pow(
-      1.0 - max(dot(normalize(vNormal), vec3(0.0, 0.0, 1.0)), 0.0),
-      3.2
-    );
+    vec3 col = alb.rgb;
+    col += fresnel_irid(normalize(vNormal));       // 이리데슨트 오버레이
+    col += emit.rgb * uEmissive;                   // 발광 텍스처 × 강도
 
-    // 팔레트
-    vec3 darkGrey = vec3(0.055, 0.055, 0.075);
-    vec3 teal     = vec3(0.0,   0.72,  0.76);
-    vec3 purple   = vec3(0.52,  0.0,   0.88);
-    vec3 gold     = vec3(0.95,  0.62,  0.09);
-
-    // 높이 기반 색상 (상단=어두움, 하단=청보라)
-    float heightT = clamp(vWorldPos.y * 0.52 + 0.52, 0.0, 1.0);
-    float angle   = atan(vWorldPos.z, vWorldPos.x) * 0.15915 + 0.5;
-
-    vec3 innerColor = mix(teal, purple, angle);
-    vec3 baseColor  = mix(innerColor, darkGrey, pow(heightT, 0.52) * 0.93);
-
-    // Fresnel 이리데슨트 오버레이
-    baseColor = mix(baseColor, mix(teal, purple, 1.0 - fresnel), fresnel * 0.68);
-
-    // 금빛 균열 합성
-    vec3 finalColor = mix(baseColor, gold, veinMask * 0.9);
-
-    // 내부 발광 (emissive glow)
-    vec3 glowColor = mix(purple * 0.55, teal * 0.65, 1.0 - heightT);
-    finalColor += glowColor * uEmissive * (0.55 + 0.45 * (1.0 - veinMask));
-
-    gl_FragColor = vec4(finalColor, 1.0);
+    gl_FragColor = vec4(col, 1.0);
   }
 `
 
 export default function StoneB() {
-  const meshRef = useRef<THREE.Mesh>(null)
-  const scene = useSceneStore((s) => s.scene)
+  const groupRef = useRef<THREE.Group>(null)
+  const scene    = useSceneStore((s) => s.scene)
   const currentEmissive = useRef(EMISSIVE_BY_SCENE.stone)
 
   const { scene: gltfScene } = useGLTF("/models/stone-b.glb")
 
-  const geometry = useMemo(() => {
-    let geo: THREE.BufferGeometry | null = null
+  // GLB에서 geometry와 베이크 텍스처 추출
+  const { geometry, albedoTex, emitTex } = useMemo(() => {
+    let geometry: THREE.BufferGeometry | null = null
+    let albedoTex: THREE.Texture | null       = null
+    let emitTex: THREE.Texture | null         = null
+
     gltfScene.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh && !geo) {
-        geo = (child as THREE.Mesh).geometry
-      }
+      const mesh = child as THREE.Mesh
+      if (!mesh.isMesh || geometry) return
+      geometry = mesh.geometry
+      const mat = mesh.material as THREE.MeshStandardMaterial
+      albedoTex = mat.map            ?? null
+      emitTex   = mat.emissiveMap    ?? null
     })
-    return geo
+    return { geometry, albedoTex, emitTex }
   }, [gltfScene])
 
-  // uniforms은 한 번만 생성 (리렌더마다 새 객체 방지)
-  const uniforms = useMemo(
-    () => ({
-      uTime:     { value: 0 },
-      uEmissive: { value: EMISSIVE_BY_SCENE.stone },
-    }),
-    []
-  )
+  const uniforms = useMemo(() => ({
+    uAlbedo:   { value: albedoTex },
+    uEmit:     { value: emitTex  },
+    uEmissive: { value: EMISSIVE_BY_SCENE.stone },
+    uTime:     { value: 0 },
+  }), [albedoTex, emitTex])
 
   useFrame(({ clock }, delta) => {
-    if (!meshRef.current) return
     const speed = Math.min(delta * 1.5, 0.1)
     currentEmissive.current = THREE.MathUtils.lerp(
-      currentEmissive.current,
-      EMISSIVE_BY_SCENE[scene],
-      speed
+      currentEmissive.current, EMISSIVE_BY_SCENE[scene], speed
     )
-    uniforms.uTime.value     = clock.getElapsedTime()
     uniforms.uEmissive.value = currentEmissive.current
+    uniforms.uTime.value     = clock.getElapsedTime()
   })
 
   return (
-    <mesh ref={meshRef} geometry={geometry ?? undefined} castShadow receiveShadow>
+    <mesh geometry={geometry ?? undefined} castShadow receiveShadow>
       {!geometry && <icosahedronGeometry args={[1.2, 1]} />}
       <shaderMaterial
         vertexShader={vertexShader}
