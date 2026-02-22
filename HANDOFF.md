@@ -1,5 +1,32 @@
 # HANDOFF — AI 작업 인계 파일
 
+## 2026-02-22 | Claude Code — 협업자(BRUCE) 검증 기반 최적화
+
+### 이번 세션 작업
+
+BRUCE 검증자의 GitHub Issue #2 및 gonmyung-engine 프로토타입 분석 후 최적화 4건 적용.
+
+**분석 결과 (서버 현황):**
+- 공명 엔진 포트: **3001** (5002로 잘못 알려져 있었음 → 수정)
+- 서버 엔진: 실제 MusicGen-small + Demucs 4.0.1 + CUDA 12.1 (BRUCE 프로토타입보다 훨씬 발전된 상태)
+- BRUCE 프로토타입(sine wave 시뮬레이션)은 참고용이며 통합 불필요
+
+**수정한 파일:**
+
+| 파일 | 변경 내용 |
+|------|---------|
+| `src/app/create/page.tsx` | `?genre=` URL 파라미터 → JoakakFeed에 전달 (분석→창작 장르 연결) |
+| `src/app/gallery/page.tsx` | 믹스 오류 무음 처리 → `mixError` state + 에러 UI 표시 |
+| `src/components/gonmyung/JoakakFeed.tsx` | `rounded-full`/`rounded-2xl` 제거 → sharp corner (뮤직 프로 디자인 통일) |
+| `src/app/profile/page.tsx` | 구형 목 데이터 페이지 → `/gallery` redirect |
+
+**빌드/배포:**
+- TypeScript 에러: 0개
+- 빌드: 성공 (16개 라우트)
+- 배포: https://sori-bice.vercel.app (2026-02-22)
+
+---
+
 ## 2026-02-22 | Claude Code — 커뮤니티 플랫폼 전환 완료
 
 ### 🎯 이번 세션 핵심 변경
