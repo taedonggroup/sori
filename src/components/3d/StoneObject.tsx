@@ -2,12 +2,11 @@
 
 // 원석 3D 오브젝트 — 씬 상태별 위치/크기/회전 보간
 // stoneType으로 3가지 원석 디자인 선택:
-//   A = 검은 현무암 (미각성)
-//   B = 균열+금맥+이리데슨트 (각성 중) ← 기본값
-//   C = 크리스탈 클러스터 (완전각성)
-import { useRef, useMemo } from "react"
+//   A = 검은 현무암 (미각성)     GLB: stone-a.glb
+//   B = 균열+금맥+이리데슨트 (각성 중) GLB: stone-b.glb  ← 기본값
+//   C = 크리스탈 클러스터 (완전각성) GLB: stone-c.glb
+import { useRef } from "react"
 import { useFrame } from "@react-three/fiber"
-import { useGLTF } from "@react-three/drei"
 import * as THREE from "three"
 import { useSceneStore, type SceneName } from "@/store/sceneStore"
 import StoneA from "./stones/StoneA"
@@ -40,19 +39,6 @@ export default function StoneObject({ stoneType = "B" }: StoneObjectProps) {
   const groupRef = useRef<THREE.Group>(null)
   const scene = useSceneStore((s) => s.scene)
 
-  // GLB 로드 (StoneA / StoneB 공통 지오메트리)
-  const { scene: gltfScene } = useGLTF("/models/raw-stone.glb")
-
-  const geometry = useMemo(() => {
-    let geo: THREE.BufferGeometry | null = null
-    gltfScene.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh && !geo) {
-        geo = (child as THREE.Mesh).geometry.clone()
-      }
-    })
-    return geo
-  }, [gltfScene])
-
   const currentPos   = useRef(new THREE.Vector3(0, 0, 0))
   const currentScale = useRef(1)
 
@@ -79,11 +65,9 @@ export default function StoneObject({ stoneType = "B" }: StoneObjectProps) {
 
   return (
     <group ref={groupRef}>
-      {stoneType === "A" && <StoneA geometry={geometry} />}
-      {stoneType === "B" && <StoneB geometry={geometry} />}
+      {stoneType === "A" && <StoneA />}
+      {stoneType === "B" && <StoneB />}
       {stoneType === "C" && <StoneC />}
     </group>
   )
 }
-
-useGLTF.preload("/models/raw-stone.glb")
