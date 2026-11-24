@@ -1,7 +1,7 @@
 // FFmpeg 믹스 프록시 — 오디오 URL 재작성 포함
 import { NextRequest, NextResponse } from "next/server";
 
-const GONMYUNG_API_URL = process.env.NEXT_PUBLIC_GONMYUNG_API_URL;
+const GONMYUNG_API_URL = process.env.GONMYUNG_API_URL;
 
 function rewriteMixUrl(url: string | null): string | null {
   if (!url) return null;

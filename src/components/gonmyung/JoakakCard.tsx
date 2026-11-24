@@ -1,6 +1,6 @@
 "use client";
 
-// 조각 카드 — 재생, 선택 모드, 인플레이스 확장
+// 조각 카드 — 상업용 수준 인터랙션 개선: 선택 글로우, 공명 노란색 브랜드 통일
 import { useState, useRef } from "react";
 import Link from "next/link";
 import { Play, Pause, Check, X } from "lucide-react";
@@ -71,21 +71,29 @@ export default function JoakakCard({
   return (
     <div
       className={`
-        relative border transition-all duration-200
+        relative border transition-all duration-300
         ${selectionMode || (!isExpanded && onToggleExpand) ? "cursor-pointer" : ""}
         ${isSelected
-          ? "border-teal-600 bg-teal-950/10"
+          ? "border-[#F8F32B] bg-[rgba(248,243,43,0.03)]"
           : isExpanded
             ? "border-zinc-700 bg-zinc-950/50"
             : "border-zinc-900 hover:border-zinc-700 bg-black"
         }
       `}
+      style={
+        isSelected
+          ? { boxShadow: "0 0 20px rgba(248, 243, 43, 0.12), inset 0 0 20px rgba(248, 243, 43, 0.03)" }
+          : {}
+      }
       onClick={!isExpanded ? handleCardClick : undefined}
     >
-      {/* 선택 표시 */}
+      {/* 선택 표시 — 공명 노란색 */}
       {selectionMode && isSelected && (
-        <div className="absolute top-3 right-3 w-5 h-5 border border-teal-500 bg-teal-500 flex items-center justify-center z-10">
-          <Check size={11} className="text-black" />
+        <div
+          className="absolute top-3 right-3 w-5 h-5 bg-[#F8F32B] flex items-center justify-center z-10"
+          style={{ boxShadow: "0 0 8px rgba(248, 243, 43, 0.6)" }}
+        >
+          <Check size={11} className="text-black" strokeWidth={3} />
         </div>
       )}
 
@@ -115,15 +123,20 @@ export default function JoakakCard({
         {/* 재생 버튼 */}
         <button
           onClick={handlePlayToggle}
-          className={`shrink-0 w-9 h-9 border flex items-center justify-center transition-all mt-0.5 ${
-            isPlaying
-              ? "border-teal-600 text-teal-400"
+          className={`shrink-0 w-9 h-9 border flex items-center justify-center transition-all duration-200 mt-0.5 ${isPlaying
+              ? "border-[#F8F32B] text-[#F8F32B]"
               : "border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300"
-          }`}
+            }`}
+          style={isPlaying ? { boxShadow: "0 0 10px rgba(248, 243, 43, 0.3)" } : {}}
           aria-label={isPlaying ? "일시정지" : "재생"}
         >
           {isPlaying ? (
-            <Pause size={13} />
+            // 재생 중: 이퀄라이저 애니메이션
+            <div className="flex items-end gap-[2px] h-3">
+              <div className="w-[2px] bg-[#F8F32B] rounded-sm animate-wave-eq-1" />
+              <div className="w-[2px] bg-[#F8F32B] rounded-sm animate-wave-eq-2" style={{ animationDelay: "0.1s" }} />
+              <div className="w-[2px] bg-[#F8F32B] rounded-sm animate-wave-eq-3" style={{ animationDelay: "0.2s" }} />
+            </div>
           ) : (
             <Play size={13} className="ml-0.5" />
           )}
@@ -135,19 +148,19 @@ export default function JoakakCard({
             {joakak.original_filename}
           </p>
 
-          {/* 닉네임 */}
+          {/* 닉네임 — 공명 노란색 */}
           <Link
             href={`/profile/${encodeURIComponent(joakak.nickname)}`}
             onClick={(e) => e.stopPropagation()}
-            className="text-[10px] text-teal-600 hover:text-teal-400 tracking-[0.15em] transition-colors"
+            className="text-[10px] text-[#F8F32B]/60 hover:text-[#F8F32B] tracking-[0.15em] transition-colors"
           >
             @{joakak.nickname}
           </Link>
 
-          {/* 음악 메타데이터 — 전문 포맷 */}
+          {/* 음악 메타데이터 */}
           <div className="flex flex-wrap items-center gap-2 mt-1.5">
             {joakak.genre && (
-              <span className="text-teal-700 text-[10px] font-mono tracking-wide">
+              <span className="text-[10px] font-mono tracking-wide px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 text-zinc-400">
                 {joakak.genre}
               </span>
             )}
@@ -157,7 +170,7 @@ export default function JoakakCard({
               </span>
             )}
             {joakak.key_signature && (
-              <span className="text-zinc-600 text-[10px] font-mono">
+              <span className="text-zinc-700 text-[10px] font-mono">
                 {joakak.key_signature}
               </span>
             )}
@@ -175,11 +188,10 @@ export default function JoakakCard({
         </div>
       </div>
 
-      {/* 확장 영역: 시크바 */}
+      {/* 확장 영역: 시크바 — 공명 노란색 */}
       <div
-        className={`overflow-hidden transition-all duration-300 ease-in-out ${
-          isExpanded ? "max-h-16 pb-4 px-4" : "max-h-0"
-        }`}
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? "max-h-20 pb-4 px-4" : "max-h-0"
+          }`}
       >
         <input
           type="range"
@@ -188,13 +200,11 @@ export default function JoakakCard({
           value={currentTime}
           onChange={handleSeek}
           onClick={(e) => e.stopPropagation()}
-          className="w-full h-px appearance-none cursor-pointer"
+          className="w-full h-px appearance-none cursor-pointer gonmyung-slider"
           style={{
             background: duration
-              ? `linear-gradient(to right, #14b8a6 ${(currentTime / duration) * 100}%, #27272a ${(currentTime / duration) * 100}%)`
+              ? `linear-gradient(to right, #F8F32B ${(currentTime / duration) * 100}%, #27272a ${(currentTime / duration) * 100}%)`
               : "#27272a",
-            outline: "none",
-            border: "none",
           }}
         />
         <div className="flex justify-between mt-2">
@@ -203,11 +213,11 @@ export default function JoakakCard({
         </div>
       </div>
 
-      {/* 페르소나 태그 */}
+      {/* 페르소나 태그 — 공명 노란색 계열 */}
       {joakak.persona.length > 0 && (
         <div className="flex flex-wrap gap-1 px-4 pb-3 pt-0 border-t border-zinc-900">
           {joakak.persona.slice(0, 3).map((tag) => (
-            <span key={tag} className="text-zinc-700 text-[10px] tracking-[0.15em] font-mono">
+            <span key={tag} className="text-[#F8F32B]/40 text-[10px] tracking-[0.15em] font-mono hover:text-[#F8F32B]/70 transition-colors">
               #{tag}
             </span>
           ))}

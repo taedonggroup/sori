@@ -1,77 +1,27 @@
 "use client";
 
 // (첫)울림 만들기 — 갤러리에서 조각 선택 → FFmpeg amix 믹스
-import { useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
 import JoakakFeed from "@/components/gonmyung/JoakakFeed";
 import MixSelector from "@/components/gonmyung/MixSelector";
 import ResonanceLoader from "@/components/gonmyung/ResonanceLoader";
-import type { Joakak, MixResponse } from "@/lib/gonmyung/types";
-
-interface MixResult {
-  outputUrl: string;
-  joakakCount: number;
-  duration: number;
-}
+import { useMixing } from "@/hooks/useMixing";
 
 // 내부 컴포넌트 — useSearchParams 사용 (Suspense 필요)
 function CreateContent() {
   const searchParams = useSearchParams();
   const genreParam = searchParams.get("genre") ?? "";
 
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [isMixing, setIsMixing] = useState(false);
-  const [mixResult, setMixResult] = useState<MixResult | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const handleSelectToggle = useCallback((joakak: Joakak) => {
-    setSelectedIds((prev) =>
-      prev.includes(joakak.id)
-        ? prev.filter((id) => id !== joakak.id)
-        : [...prev, joakak.id]
-    );
-  }, []);
-
-  const handleMix = useCallback(async () => {
-    if (selectedIds.length < 2) return;
-    setIsMixing(true);
-    setErrorMessage(null);
-    try {
-      const response = await fetch("/api/gonmyung/mix", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ joakak_ids: selectedIds }),
-      });
-      if (!response.ok) throw new Error(`믹스 실패: ${response.status}`);
-      const data = (await response.json()) as MixResponse;
-      setMixResult({
-        outputUrl: data.output_url,
-        joakakCount: data.joakak_count,
-        duration: data.duration,
-      });
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : "공명 믹스에 실패했습니다."
-      );
-    } finally {
-      setIsMixing(false);
-    }
-  }, [selectedIds]);
-
-  const handleReset = useCallback(() => {
-    setMixResult(null);
-    setSelectedIds([]);
-    setErrorMessage(null);
-  }, []);
+  const { selectedIds, isMixing, mixResult, mixError, mixProgress, handleSelectToggle, handleMix, handleReset } = useMixing();
 
   return (
     <main className="min-h-screen bg-black text-white">
       {/* 공명 로딩 오버레이 */}
       <ResonanceLoader
         isLoading={isMixing}
-        progress={isMixing ? 50 : 0}
+        progress={mixProgress}
         currentStep="조각들을 공명으로 믹싱하는 중..."
       />
 
@@ -90,9 +40,9 @@ function CreateContent() {
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 pb-28 sm:pb-8">
         {/* 에러 메시지 */}
-        {errorMessage && (
+        {mixError && (
           <div className="mb-6 p-4 bg-black border border-red-900 text-center">
-            <p className="text-red-400 text-sm">{errorMessage}</p>
+            <p className="text-red-400 text-sm">{mixError}</p>
           </div>
         )}
 

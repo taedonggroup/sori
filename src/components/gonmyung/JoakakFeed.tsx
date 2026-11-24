@@ -30,6 +30,8 @@ export default function JoakakFeed({
   selectedIds = [],
   onSelectToggle,
 }: JoakakFeedProps) {
+  // genreFilter가 외부에서 제어될 때와 내부 탭으로 제어될 때를 구분
+  const isExternalFilter = genreFilter !== undefined;
   const [joakakList, setJoakakList] = useState<Joakak[]>([]);
   const [page, setPage] = useState(1);
   const [hasNext, setHasNext] = useState(false);
@@ -38,6 +40,13 @@ export default function JoakakFeed({
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const lastCardRef = useRef<HTMLDivElement | null>(null);
+
+  // 외부 genreFilter 변경 시 동기화
+  useEffect(() => {
+    if (isExternalFilter) {
+      setActiveGenre(genreFilter ?? "");
+    }
+  }, [genreFilter, isExternalFilter]);
 
   const fetchJoakak = useCallback(async (pageNum: number, genre: string, reset = false) => {
     setIsLoading(true);
@@ -57,7 +66,7 @@ export default function JoakakFeed({
     }
   }, []);
 
-  // 장르 탭 변경 시 리셋
+  // 장르 변경 시 리셋
   useEffect(() => {
     setJoakakList([]);
     setPage(1);
@@ -91,24 +100,26 @@ export default function JoakakFeed({
 
   return (
     <div className="space-y-4">
-      {/* 장르 필터 탭 */}
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-        {GENRE_TABS.map((tab) => (
-          <button
-            key={tab.value}
-            onClick={() => setActiveGenre(tab.value)}
-            className={`
-              shrink-0 px-4 py-1.5 text-xs tracking-wider transition-all duration-200
-              ${activeGenre === tab.value
-                ? "bg-white text-black"
-                : "bg-zinc-950 border border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
-              }
-            `}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      {/* 장르 필터 탭 — 외부 필터가 없을 때만 표시 */}
+      {!isExternalFilter && (
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          {GENRE_TABS.map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => setActiveGenre(tab.value)}
+              className={`
+                shrink-0 px-4 py-1.5 text-xs tracking-wider transition-all duration-200
+                ${activeGenre === tab.value
+                  ? "bg-white text-black"
+                  : "bg-zinc-950 border border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
+                }
+              `}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* 조각 그리드 */}
       {joakakList.length === 0 && !isLoading ? (

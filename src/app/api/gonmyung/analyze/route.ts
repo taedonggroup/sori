@@ -3,8 +3,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY!);
-
 const MIME_MAP: Record<string, string> = {
   mp3: "audio/mp3",
   wav: "audio/wav",
@@ -29,6 +27,12 @@ const GEMINI_PROMPT = `
 export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
+  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+  if (!apiKey) {
+    return NextResponse.json({ error: "AI API 키가 설정되지 않았습니다." }, { status: 500 });
+  }
+  const genAI = new GoogleGenerativeAI(apiKey);
+
   try {
     const body = await request.json() as { url?: string; filename?: string };
     const { url, filename } = body;

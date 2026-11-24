@@ -1,9 +1,11 @@
-# SORI 프로젝트 — Claude Code 지시서
+# SORI Legacy (구버전) — Claude Code 지시서
 
-> 이 파일을 읽은 Claude는 SORI 프로젝트의 개발자로서 역할을 수행합니다.
+> ⚠️ **이 프로젝트는 LEGACY 입니다.** 신규 개발은 `~/Projects/SORI`(SORI_V2)에서 진행하세요.
+>
+> 이 파일은 SORI 구버전 (taedonggroup/sori) 참조용. 신규 기능 추가 금지, 마이그레이션/버그 fix만 허용.
 
 ## 프로젝트 정보
-- **프로젝트명**: SORI
+- **프로젝트명**: SORI (Legacy)
 - **회사**: 태동 (TEDONG)
 - **GitHub 조직**: taedonggroup
 - **저장소**: https://github.com/taedonggroup/sori
@@ -21,7 +23,7 @@
 | 메인 페이지 | 공간 | 서비스 랜딩/메인 화면 |
 
 ## 기술 스택
-- **Framework**: Next.js 14 (App Router)
+- **Framework**: Next.js 16 (App Router)
 - **UI**: shadcn/ui + Tailwind CSS
 - **언어**: TypeScript (strict 모드)
 - **배포**: Vercel
@@ -74,3 +76,24 @@ docs: HANDOFF 업데이트
 2. TypeScript 에러 없음 (npx tsc --noEmit)
 3. 빌드 성공 (npm run build)
 4. HANDOFF.md 업데이트 완료
+
+---
+
+## 운영 원칙 (Legacy — 유지보수만)
+
+| 구분 | 범위 | 승인 |
+|---|---|---|
+| 즉시 실행 | 버그 fix, 보안 패치 | 불필요 |
+| 선보고 | 마이그레이션 데이터 처리 | CEO |
+| 절대 금지 | 신규 기능 추가, UI 리뉴얼 (V2로 옮길 것) | - |
+
+## AI 협업
+- **Claude Code**: Legacy 유지보수 전용
+- 신규 개발은 SORI_V2(`~/Projects/SORI`)에서
+
+## 메모리 시스템
+- `~/.claude/memory/MEMORY.md`의 SORI 섹션 참조
+- 신규 결정사항은 SORI_V2 메모리에만 추가
+
+---
+최종 업데이트: 2026-05-15 (claude-md-management 표준 적용 — Legacy 표시)

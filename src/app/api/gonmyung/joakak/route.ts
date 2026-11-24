@@ -1,7 +1,7 @@
 // 조각 목록 조회 + 업로드 프록시
 import { NextRequest, NextResponse } from "next/server";
 
-const GONMYUNG_API_URL = process.env.NEXT_PUBLIC_GONMYUNG_API_URL;
+const GONMYUNG_API_URL = process.env.GONMYUNG_API_URL;
 
 export async function GET(request: NextRequest) {
   if (!GONMYUNG_API_URL) {
